@@ -1,0 +1,17 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Environment
+.env
+.env.local
+
+# Subdirectories with their own repos
+backend/
+frontend/
+frontend-lovable/
