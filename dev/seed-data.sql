@@ -7,32 +7,32 @@
 -- ============================================================================
 INSERT INTO users (id, email, password_hash, first_name, last_name, phone, role, is_active, created_at, updated_at) VALUES
 -- Admin user
-('a0000001-0000-0000-0000-000000000001', 'admin@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Admin', 'User', '555-0100', 'admin', true, NOW(), NOW()),
+('a0000001-0000-0000-0000-000000000001', 'admin@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Admin', 'User', '555-0100', 'admin', true, NOW(), NOW()),
 -- Commissioner
-('a0000002-0000-0000-0000-000000000001', 'commissioner@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'League', 'Commissioner', '555-0101', 'commissioner', true, NOW(), NOW()),
+('a0000002-0000-0000-0000-000000000001', 'commissioner@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'League', 'Commissioner', '555-0101', 'commissioner', true, NOW(), NOW()),
 -- Coaches
-('a0000010-0000-0000-0000-000000000001', 'coach.smith@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'John', 'Smith', '555-0110', 'coach', true, NOW(), NOW()),
-('a0000011-0000-0000-0000-000000000001', 'coach.johnson@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Sarah', 'Johnson', '555-0111', 'coach', true, NOW(), NOW()),
-('a0000012-0000-0000-0000-000000000001', 'coach.williams@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Mike', 'Williams', '555-0112', 'coach', true, NOW(), NOW()),
-('a0000013-0000-0000-0000-000000000001', 'coach.brown@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Emily', 'Brown', '555-0113', 'coach', true, NOW(), NOW()),
+('a0000010-0000-0000-0000-000000000001', 'coach.smith@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'John', 'Smith', '555-0110', 'coach', true, NOW(), NOW()),
+('a0000011-0000-0000-0000-000000000001', 'coach.johnson@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Sarah', 'Johnson', '555-0111', 'coach', true, NOW(), NOW()),
+('a0000012-0000-0000-0000-000000000001', 'coach.williams@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Mike', 'Williams', '555-0112', 'coach', true, NOW(), NOW()),
+('a0000013-0000-0000-0000-000000000001', 'coach.brown@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Emily', 'Brown', '555-0113', 'coach', true, NOW(), NOW()),
 -- Parents/Guardians
-('a0000020-0000-0000-0000-000000000001', 'parent.jones@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Robert', 'Jones', '555-0120', 'guardian', true, NOW(), NOW()),
-('a0000021-0000-0000-0000-000000000001', 'parent.davis@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Jennifer', 'Davis', '555-0121', 'guardian', true, NOW(), NOW()),
-('a0000022-0000-0000-0000-000000000001', 'parent.miller@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'David', 'Miller', '555-0122', 'guardian', true, NOW(), NOW()),
-('a0000023-0000-0000-0000-000000000001', 'parent.wilson@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Lisa', 'Wilson', '555-0123', 'guardian', true, NOW(), NOW()),
+('a0000020-0000-0000-0000-000000000001', 'parent.jones@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Robert', 'Jones', '555-0120', 'guardian', true, NOW(), NOW()),
+('a0000021-0000-0000-0000-000000000001', 'parent.davis@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Jennifer', 'Davis', '555-0121', 'guardian', true, NOW(), NOW()),
+('a0000022-0000-0000-0000-000000000001', 'parent.miller@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'David', 'Miller', '555-0122', 'guardian', true, NOW(), NOW()),
+('a0000023-0000-0000-0000-000000000001', 'parent.wilson@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Lisa', 'Wilson', '555-0123', 'guardian', true, NOW(), NOW()),
 -- Players (these are users who play)
-('a0000030-0000-0000-0000-000000000001', 'player1@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Jake', 'Jones', NULL, 'player', true, NOW(), NOW()),
-('a0000031-0000-0000-0000-000000000001', 'player2@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Emma', 'Davis', NULL, 'player', true, NOW(), NOW()),
-('a0000032-0000-0000-0000-000000000001', 'player3@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Liam', 'Miller', NULL, 'player', true, NOW(), NOW()),
-('a0000033-0000-0000-0000-000000000001', 'player4@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Sophia', 'Wilson', NULL, 'player', true, NOW(), NOW()),
-('a0000034-0000-0000-0000-000000000001', 'player5@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Noah', 'Taylor', NULL, 'player', true, NOW(), NOW()),
-('a0000035-0000-0000-0000-000000000001', 'player6@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Olivia', 'Anderson', NULL, 'player', true, NOW(), NOW()),
-('a0000036-0000-0000-0000-000000000001', 'player7@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Mason', 'Thomas', NULL, 'player', true, NOW(), NOW()),
-('a0000037-0000-0000-0000-000000000001', 'player8@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Ava', 'Jackson', NULL, 'player', true, NOW(), NOW()),
-('a0000038-0000-0000-0000-000000000001', 'player9@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Ethan', 'White', NULL, 'player', true, NOW(), NOW()),
-('a0000039-0000-0000-0000-000000000001', 'player10@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Isabella', 'Harris', NULL, 'player', true, NOW(), NOW()),
-('a0000040-0000-0000-0000-000000000001', 'player11@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Aiden', 'Martin', NULL, 'player', true, NOW(), NOW()),
-('a0000041-0000-0000-0000-000000000001', 'player12@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$YWJjZGVmZ2hpamtsbW5vcA$8K4x5qL3z9vN2mP1rS7wYhT6uX0cF4eA3bD2gH1jK5M', 'Mia', 'Garcia', NULL, 'player', true, NOW(), NOW())
+('a0000030-0000-0000-0000-000000000001', 'player1@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Jake', 'Jones', NULL, 'player', true, NOW(), NOW()),
+('a0000031-0000-0000-0000-000000000001', 'player2@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Emma', 'Davis', NULL, 'player', true, NOW(), NOW()),
+('a0000032-0000-0000-0000-000000000001', 'player3@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Liam', 'Miller', NULL, 'player', true, NOW(), NOW()),
+('a0000033-0000-0000-0000-000000000001', 'player4@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Sophia', 'Wilson', NULL, 'player', true, NOW(), NOW()),
+('a0000034-0000-0000-0000-000000000001', 'player5@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Noah', 'Taylor', NULL, 'player', true, NOW(), NOW()),
+('a0000035-0000-0000-0000-000000000001', 'player6@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Olivia', 'Anderson', NULL, 'player', true, NOW(), NOW()),
+('a0000036-0000-0000-0000-000000000001', 'player7@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Mason', 'Thomas', NULL, 'player', true, NOW(), NOW()),
+('a0000037-0000-0000-0000-000000000001', 'player8@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Ava', 'Jackson', NULL, 'player', true, NOW(), NOW()),
+('a0000038-0000-0000-0000-000000000001', 'player9@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Ethan', 'White', NULL, 'player', true, NOW(), NOW()),
+('a0000039-0000-0000-0000-000000000001', 'player10@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Isabella', 'Harris', NULL, 'player', true, NOW(), NOW()),
+('a0000040-0000-0000-0000-000000000001', 'player11@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Aiden', 'Martin', NULL, 'player', true, NOW(), NOW()),
+('a0000041-0000-0000-0000-000000000001', 'player12@teamio.local', '$argon2id$v=19$m=19456,t=2,p=1$PuvgXS+7WnX9hTsGPhjfhQ$/pxhEjh9AAacX1zCyBq4C6aVN18dajrmCN2U+3K5+gM', 'Mia', 'Garcia', NULL, 'player', true, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
