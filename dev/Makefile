@@ -57,6 +57,17 @@ db-reset: ## Reset database (removes all data)
 	@sleep 5
 	docker compose up -d backend
 
+db-seed: ## Load sample data into database
+	@echo "Loading seed data..."
+	docker compose exec -T db psql -U teamio -d teamio < seed-data.sql
+	@echo "Seed data loaded!"
+
+db-fresh: ## Reset database and load seed data
+	$(MAKE) db-reset
+	@echo "Waiting for migrations to complete..."
+	@sleep 10
+	$(MAKE) db-seed
+
 # =============================================================================
 # Development Shortcuts
 # =============================================================================
