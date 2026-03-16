@@ -24,6 +24,8 @@ The core features of the TeamIO sports league management platform are implemente
 | User Invites | ✅ | ✅ | Email invitations with token-based flow |
 | Game Scoring | ✅ | ✅ | Score entry, standings calculations |
 | Reports & Analytics | ✅ | ✅ | Standings, results, event/registration stats |
+| Mobile Responsiveness | - | ✅ | Scroll tables, responsive grids, mobile-first |
+| Testing | - | ✅ | 20 unit tests (Vitest + React Testing Library) |
 
 ---
 
