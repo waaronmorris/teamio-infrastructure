@@ -39,6 +39,7 @@ The core features of the TeamIO sports league management platform are implemente
 | CSV Data Export | - | ✅ | Export standings, users, events, registrations to CSV |
 | Season Management | ✅ | ✅ | Season list, status filtering, stats cards |
 | API Documentation | ✅ | - | Swagger UI at /swagger-ui with OpenAPI spec |
+| Payment Processing | ✅ | ✅ | Abstract provider: Stripe, PayPal, Square, Manual/Cash |
 
 ---
 
@@ -225,7 +226,7 @@ Add automated tests for reliability.
 ## Future Considerations
 
 - **Multi-organization support** - Allow multiple leagues/organizations
-- **Payment processing** - Stripe/PayPal integration for registration fees
+- ~~Payment processing~~ - Done (abstract provider: Stripe, PayPal, Square, Manual)
 - ~~Photo galleries~~ - Done (abstract storage: local, S3, GCS, Azure)
 - ~~API documentation~~ - Done (Swagger UI at /swagger-ui)
 - **Dark mode** - Full dark theme support
