@@ -36,6 +36,9 @@ The core features of the TeamIO sports league management platform are implemente
 | Dashboard Home | ✅ | ✅ | Live stats, standings, quick actions (no mock data) |
 | User Profile | ✅ | ✅ | Edit info, change password, account details |
 | Photo Gallery | ✅ | ✅ | Upload, grid view, album filtering, cloud storage abstraction |
+| CSV Data Export | - | ✅ | Export standings, users, events, registrations to CSV |
+| Season Management | ✅ | ✅ | Season list, status filtering, stats cards |
+| API Documentation | ✅ | - | Swagger UI at /swagger-ui with OpenAPI spec |
 
 ---
 
@@ -224,6 +227,6 @@ Add automated tests for reliability.
 - **Multi-organization support** - Allow multiple leagues/organizations
 - **Payment processing** - Stripe/PayPal integration for registration fees
 - ~~Photo galleries~~ - Done (abstract storage: local, S3, GCS, Azure)
-- **API documentation** - OpenAPI/Swagger docs
+- ~~API documentation~~ - Done (Swagger UI at /swagger-ui)
 - **Dark mode** - Full dark theme support
 - **Dashboard home improvements** - Recent activity feed, quick actions
