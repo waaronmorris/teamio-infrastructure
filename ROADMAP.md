@@ -32,6 +32,8 @@ The core features of the TeamIO sports league management platform are implemente
 | Messaging | ✅ | ✅ | Inbox, conversations, compose, mark-as-read |
 | Audit Logging | ✅ | ✅ | Track admin actions with filtering |
 | PWA Support | - | ✅ | Web manifest, service worker, installable app |
+| Dark Mode | - | ✅ | Light/dark/system theme from user settings |
+| Dashboard Home | ✅ | ✅ | Live stats, standings, quick actions (no mock data) |
 
 ---
 
@@ -209,21 +211,9 @@ Add automated tests for reliability.
 
 ## Technical Debt
 
-### CSS Warning
-The `@import` statement in `index.css` should be moved before `@tailwind` directives:
-```css
-@import url('https://fonts.googleapis.com/css2?family=Inter...');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
-### Browserslist Update
-Run `npx update-browserslist-db@latest` to update browser compatibility data.
-
-### Type Improvements
-- Add stricter TypeScript types for API responses
-- Create shared types package for frontend/backend
+- ~~CSS Warning~~ - Fixed (moved @import before @tailwind)
+- Browserslist Update - Run `npx update-browserslist-db@latest`
+- Type Improvements - Add stricter TypeScript types for API responses
 
 ---
 
@@ -231,8 +221,7 @@ Run `npx update-browserslist-db@latest` to update browser compatibility data.
 
 - **Multi-organization support** - Allow multiple leagues/organizations
 - **Payment processing** - Stripe/PayPal integration for registration fees
-- **Communication tools** - In-app messaging between coaches/parents
 - **Photo galleries** - Team and game photos
-- **Mobile app** - React Native or PWA
 - **API documentation** - OpenAPI/Swagger docs
-- **Audit logging** - Track admin actions for compliance
+- **Dark mode** - Full dark theme support
+- **Dashboard home improvements** - Recent activity feed, quick actions
