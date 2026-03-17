@@ -26,6 +26,12 @@ The core features of the TeamIO sports league management platform are implemente
 | Reports & Analytics | ✅ | ✅ | Standings, results, event/registration stats |
 | Mobile Responsiveness | - | ✅ | Scroll tables, responsive grids, mobile-first |
 | Testing | - | ✅ | 20 unit tests (Vitest + React Testing Library) |
+| Invite Acceptance | ✅ | ✅ | /invite/:token page with account creation |
+| Notification Center | - | ✅ | Bell icon popover with unread badges |
+| Player Stats | ✅ | ✅ | Stat types, leaderboards, player season stats |
+| Messaging | ✅ | ✅ | Inbox, conversations, compose, mark-as-read |
+| Audit Logging | ✅ | ✅ | Track admin actions with filtering |
+| PWA Support | - | ✅ | Web manifest, service worker, installable app |
 
 ---
 
