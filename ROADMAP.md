@@ -25,7 +25,8 @@ The core features of the TeamIO sports league management platform are implemente
 | Game Scoring | ✅ | ✅ | Score entry, standings calculations |
 | Reports & Analytics | ✅ | ✅ | Standings, results, event/registration stats |
 | Mobile Responsiveness | - | ✅ | Scroll tables, responsive grids, mobile-first |
-| Testing | - | ✅ | 20 unit tests (Vitest + React Testing Library) |
+| Testing | - | ✅ | 32 unit + 27 E2E tests (Vitest + Playwright) |
+| OrbStack Deployment | ✅ | ✅ | Production Docker build with nginx proxy |
 | Invite Acceptance | ✅ | ✅ | /invite/:token page with account creation |
 | Notification Center | - | ✅ | Bell icon popover with unread badges |
 | Player Stats | ✅ | ✅ | Stat types, leaderboards, player season stats |
