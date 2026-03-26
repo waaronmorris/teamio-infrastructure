@@ -14,3 +14,6 @@
 # Subdirectories with their own repos
 backend/
 frontend/
+ios/
+android/
+terraform/
