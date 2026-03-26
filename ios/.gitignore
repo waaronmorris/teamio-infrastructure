@@ -1,0 +1,32 @@
+## Xcode
+*.xcodeproj/
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+
+## Build
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+*.xcodeproj
+
+## Misc
+*.hmap
+*.swp
+*~
+.DS_Store
+*.pem
+*.p12
+*.mobileprovision
