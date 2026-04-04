@@ -37,38 +37,51 @@ interface UserProfile {
   role: 'admin' | 'commissioner' | 'coach' | 'guardian' | 'player';
   org_id: string;
   org_name: string;
+  org_type: 'parks_rec' | 'travel_team' | 'tournament_org';
+  sport: string;
+  competition_level: 'recreational' | 'competitive';
+  city: string;
+  state: string;
+  zip_code: string;
+  children_count?: number;
+  teams_count: number;
+  signup_source: string;
+  platform: 'web' | 'ios' | 'android';
 }
 
 const USERS: UserProfile[] = [
   // Admins
-  { distinct_id: 'a0000001-0000-0000-0000-000000000001', email: 'admin@teamio.local', name: 'Admin User', role: 'admin', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
+  { distinct_id: 'a0000001-0000-0000-0000-000000000001', email: 'admin@teamio.local', name: 'Admin User', role: 'admin', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92501', teams_count: 0, signup_source: 'direct', platform: 'web' },
   // Commissioners
-  { distinct_id: 'a0000002-0000-0000-0000-000000000001', email: 'commissioner@teamio.local', name: 'League Commissioner', role: 'commissioner', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000003-0000-0000-0000-000000000001', email: 'commissioner.valley@teamio.local', name: 'Carlos Rivera', role: 'commissioner', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
-  { distinct_id: 'a0000004-0000-0000-0000-000000000001', email: 'commissioner.tournament@teamio.local', name: 'Patricia Nguyen', role: 'commissioner', org_id: 'b0000003-0000-0000-0000-000000000001', org_name: 'Central Valley Tournament Series' },
+  { distinct_id: 'a0000002-0000-0000-0000-000000000001', email: 'commissioner@teamio.local', name: 'League Commissioner', role: 'commissioner', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92501', teams_count: 8, signup_source: 'direct', platform: 'web' },
+  { distinct_id: 'a0000003-0000-0000-0000-000000000001', email: 'commissioner.valley@teamio.local', name: 'Carlos Rivera', role: 'commissioner', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Hillcrest', state: 'CA', zip_code: '92506', teams_count: 4, signup_source: 'partner', platform: 'web' },
+  { distinct_id: 'a0000004-0000-0000-0000-000000000001', email: 'commissioner.tournament@teamio.local', name: 'Patricia Nguyen', role: 'commissioner', org_id: 'b0000003-0000-0000-0000-000000000001', org_name: 'Central Valley Tournament Series', org_type: 'tournament_org', sport: 'baseball', competition_level: 'competitive', city: 'Fresno', state: 'CA', zip_code: '93721', teams_count: 0, signup_source: 'google', platform: 'web' },
   // Coaches
-  { distinct_id: 'a0000010-0000-0000-0000-000000000001', email: 'coach.smith@teamio.local', name: 'John Smith', role: 'coach', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000011-0000-0000-0000-000000000001', email: 'coach.johnson@teamio.local', name: 'Sarah Johnson', role: 'coach', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000012-0000-0000-0000-000000000001', email: 'coach.williams@teamio.local', name: 'Mike Williams', role: 'coach', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000014-0000-0000-0000-000000000001', email: 'coach.martinez@teamio.local', name: 'Luis Martinez', role: 'coach', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
-  { distinct_id: 'a0000015-0000-0000-0000-000000000001', email: 'coach.lee@teamio.local', name: 'Kevin Lee', role: 'coach', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
+  { distinct_id: 'a0000010-0000-0000-0000-000000000001', email: 'coach.smith@teamio.local', name: 'John Smith', role: 'coach', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92501', teams_count: 1, signup_source: 'email', platform: 'web' },
+  { distinct_id: 'a0000011-0000-0000-0000-000000000001', email: 'coach.johnson@teamio.local', name: 'Sarah Johnson', role: 'coach', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92502', teams_count: 1, signup_source: 'facebook', platform: 'ios' },
+  { distinct_id: 'a0000012-0000-0000-0000-000000000001', email: 'coach.williams@teamio.local', name: 'Mike Williams', role: 'coach', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Corona', state: 'CA', zip_code: '92503', teams_count: 1, signup_source: 'google', platform: 'web' },
+  { distinct_id: 'a0000014-0000-0000-0000-000000000001', email: 'coach.martinez@teamio.local', name: 'Luis Martinez', role: 'coach', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Hillcrest', state: 'CA', zip_code: '92506', teams_count: 1, signup_source: 'partner', platform: 'web' },
+  { distinct_id: 'a0000015-0000-0000-0000-000000000001', email: 'coach.lee@teamio.local', name: 'Kevin Lee', role: 'coach', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Temecula', state: 'CA', zip_code: '92506', teams_count: 1, signup_source: 'instagram', platform: 'ios' },
   // Guardians
-  { distinct_id: 'a0000020-0000-0000-0000-000000000001', email: 'parent.jones@teamio.local', name: 'Robert Jones', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000021-0000-0000-0000-000000000001', email: 'parent.davis@teamio.local', name: 'Jennifer Davis', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000022-0000-0000-0000-000000000001', email: 'parent.miller@teamio.local', name: 'David Miller', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000023-0000-0000-0000-000000000001', email: 'parent.wilson@teamio.local', name: 'Lisa Wilson', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000024-0000-0000-0000-000000000001', email: 'parent.chen@teamio.local', name: 'Wei Chen', role: 'guardian', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
-  { distinct_id: 'a0000025-0000-0000-0000-000000000001', email: 'parent.brooks@teamio.local', name: 'Tamika Brooks', role: 'guardian', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
-  { distinct_id: 'a0000026-0000-0000-0000-000000000001', email: 'parent.garcia@teamio.local', name: 'Miguel Garcia', role: 'guardian', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
+  { distinct_id: 'a0000020-0000-0000-0000-000000000001', email: 'parent.jones@teamio.local', name: 'Robert Jones', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92501', children_count: 2, teams_count: 1, signup_source: 'google', platform: 'ios' },
+  { distinct_id: 'a0000021-0000-0000-0000-000000000001', email: 'parent.davis@teamio.local', name: 'Jennifer Davis', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92502', children_count: 1, teams_count: 1, signup_source: 'facebook', platform: 'web' },
+  { distinct_id: 'a0000022-0000-0000-0000-000000000001', email: 'parent.miller@teamio.local', name: 'David Miller', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'San Bernardino', state: 'CA', zip_code: '92503', children_count: 1, teams_count: 1, signup_source: 'email', platform: 'android' },
+  { distinct_id: 'a0000023-0000-0000-0000-000000000001', email: 'parent.wilson@teamio.local', name: 'Lisa Wilson', role: 'guardian', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Corona', state: 'CA', zip_code: '92503', children_count: 3, teams_count: 2, signup_source: 'nextdoor', platform: 'ios' },
+  { distinct_id: 'a0000024-0000-0000-0000-000000000001', email: 'parent.chen@teamio.local', name: 'Wei Chen', role: 'guardian', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Hillcrest', state: 'CA', zip_code: '92506', children_count: 1, teams_count: 1, signup_source: 'partner', platform: 'web' },
+  { distinct_id: 'a0000025-0000-0000-0000-000000000001', email: 'parent.brooks@teamio.local', name: 'Tamika Brooks', role: 'guardian', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Redlands', state: 'CA', zip_code: '92506', children_count: 2, teams_count: 1, signup_source: 'google', platform: 'ios' },
+  { distinct_id: 'a0000026-0000-0000-0000-000000000001', email: 'parent.garcia@teamio.local', name: 'Miguel Garcia', role: 'guardian', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Ontario', state: 'CA', zip_code: '92506', children_count: 1, teams_count: 1, signup_source: 'facebook', platform: 'android' },
   // Players
-  { distinct_id: 'a0000030-0000-0000-0000-000000000001', email: 'player1@teamio.local', name: 'Jake Jones', role: 'player', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000031-0000-0000-0000-000000000001', email: 'player2@teamio.local', name: 'Emma Davis', role: 'player', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation' },
-  { distinct_id: 'a0000042-0000-0000-0000-000000000001', email: 'player13@teamio.local', name: 'Dylan Chen', role: 'player', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
-  { distinct_id: 'a0000043-0000-0000-0000-000000000001', email: 'player14@teamio.local', name: 'Marcus Brooks', role: 'player', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball' },
+  { distinct_id: 'a0000030-0000-0000-0000-000000000001', email: 'player1@teamio.local', name: 'Jake Jones', role: 'player', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92501', teams_count: 1, signup_source: 'direct', platform: 'ios' },
+  { distinct_id: 'a0000031-0000-0000-0000-000000000001', email: 'player2@teamio.local', name: 'Emma Davis', role: 'player', org_id: 'b0000001-0000-0000-0000-000000000001', org_name: 'Riverside Parks & Recreation', org_type: 'parks_rec', sport: 'soccer', competition_level: 'recreational', city: 'Riverside', state: 'CA', zip_code: '92502', teams_count: 1, signup_source: 'direct', platform: 'ios' },
+  { distinct_id: 'a0000042-0000-0000-0000-000000000001', email: 'player13@teamio.local', name: 'Dylan Chen', role: 'player', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Hillcrest', state: 'CA', zip_code: '92506', teams_count: 1, signup_source: 'direct', platform: 'android' },
+  { distinct_id: 'a0000043-0000-0000-0000-000000000001', email: 'player14@teamio.local', name: 'Marcus Brooks', role: 'player', org_id: 'b0000002-0000-0000-0000-000000000001', org_name: 'Valley Select Baseball', org_type: 'travel_team', sport: 'baseball', competition_level: 'competitive', city: 'Redlands', state: 'CA', zip_code: '92506', teams_count: 1, signup_source: 'direct', platform: 'ios' },
 ];
 
 // Anonymous visitors who don't complete signup
 const ANON_VISITORS = Array.from({ length: 15 }, (_, i) => `anon-visitor-${i + 1}`);
+
+// Lookup map for auto-resolving user context from distinct_id
+const USER_MAP = new Map<string, UserProfile>(USERS.map(u => [u.distinct_id, u]));
 
 const TEAMS = [
   { id: '11000001', name: 'Riverside Eagles', sport: 'soccer', org: 'Riverside Parks & Recreation' },
@@ -111,23 +124,59 @@ const MARKETING_URL = 'https://www.getteamio.com';
 // GA-style Marketing / Acquisition Data
 // ============================================================================
 
-const UTM_CAMPAIGNS = [
-  { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'spring-registration-2026', utm_content: 'youth-soccer-ad', utm_term: 'youth soccer registration' },
-  { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'spring-registration-2026', utm_content: 'baseball-ad', utm_term: 'travel baseball signup' },
-  { utm_source: 'google', utm_medium: 'organic', utm_campaign: undefined, utm_content: undefined, utm_term: 'youth sports management app' },
-  { utm_source: 'google', utm_medium: 'organic', utm_campaign: undefined, utm_content: undefined, utm_term: 'kids soccer league near me' },
-  { utm_source: 'facebook', utm_medium: 'paid_social', utm_campaign: 'parent-awareness-spring', utm_content: 'carousel-team-photos', utm_term: undefined },
-  { utm_source: 'facebook', utm_medium: 'paid_social', utm_campaign: 'parent-awareness-spring', utm_content: 'video-testimonial', utm_term: undefined },
-  { utm_source: 'facebook', utm_medium: 'social', utm_campaign: undefined, utm_content: 'shared-post', utm_term: undefined },
-  { utm_source: 'instagram', utm_medium: 'paid_social', utm_campaign: 'coach-recruitment', utm_content: 'stories-ad', utm_term: undefined },
-  { utm_source: 'instagram', utm_medium: 'social', utm_campaign: undefined, utm_content: 'bio-link', utm_term: undefined },
-  { utm_source: 'email', utm_medium: 'email', utm_campaign: 'spring-season-reminder', utm_content: 'cta-register-now', utm_term: undefined },
-  { utm_source: 'email', utm_medium: 'email', utm_campaign: 'welcome-series', utm_content: 'onboarding-step-2', utm_term: undefined },
-  { utm_source: 'email', utm_medium: 'email', utm_campaign: 'weekly-digest', utm_content: 'schedule-update', utm_term: undefined },
-  { utm_source: 'partner', utm_medium: 'referral', utm_campaign: 'riverside-parks-partnership', utm_content: 'website-banner', utm_term: undefined },
-  { utm_source: 'partner', utm_medium: 'referral', utm_campaign: 'ymca-cross-promo', utm_content: 'newsletter-feature', utm_term: undefined },
-  { utm_source: 'nextdoor', utm_medium: 'social', utm_campaign: 'community-post', utm_content: undefined, utm_term: undefined },
-  { utm_source: 'tiktok', utm_medium: 'paid_social', utm_campaign: 'youth-sports-awareness', utm_content: 'coach-day-in-life', utm_term: undefined },
+interface UTMCampaign {
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+  utm_ad_group?: string;
+  utm_creative?: string;
+  utm_placement?: string;
+  utm_network?: string;
+  utm_match_type?: string;
+  click_id_type?: 'gclid' | 'fbclid' | 'ttclid' | 'msclkid' | 'li_fat_id';
+  channel_group: string;
+}
+
+const UTM_CAMPAIGNS: UTMCampaign[] = [
+  // Google Ads - Search
+  { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'spring-registration-2026', utm_content: 'youth-soccer-ad', utm_term: 'youth soccer registration', utm_ad_group: 'soccer-registration-exact', utm_network: 'google_search', utm_match_type: 'exact', utm_placement: 'search-top', click_id_type: 'gclid', channel_group: 'Paid Search' },
+  { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'spring-registration-2026', utm_content: 'baseball-ad', utm_term: 'travel baseball signup', utm_ad_group: 'baseball-travel-broad', utm_network: 'google_search', utm_match_type: 'broad', utm_placement: 'search-top', click_id_type: 'gclid', channel_group: 'Paid Search' },
+  { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'brand-awareness-q1', utm_content: 'teamio-brand', utm_term: 'teamio app', utm_ad_group: 'brand-exact', utm_network: 'google_search', utm_match_type: 'exact', click_id_type: 'gclid', channel_group: 'Paid Search' },
+  // Google Ads - Display
+  { utm_source: 'google', utm_medium: 'display', utm_campaign: 'retargeting-cart-abandoners', utm_content: 'banner-300x250', utm_ad_group: 'cart-abandoners-7d', utm_network: 'google_display', utm_creative: 'spring-promo-v2', utm_placement: 'sports-sites', click_id_type: 'gclid', channel_group: 'Display' },
+  // Google Organic
+  { utm_source: 'google', utm_medium: 'organic', utm_term: 'youth sports management app', channel_group: 'Organic Search' },
+  { utm_source: 'google', utm_medium: 'organic', utm_term: 'kids soccer league near me', channel_group: 'Organic Search' },
+  { utm_source: 'google', utm_medium: 'organic', utm_term: 'travel baseball registration online', channel_group: 'Organic Search' },
+  // Facebook/Meta - Paid
+  { utm_source: 'facebook', utm_medium: 'paid_social', utm_campaign: 'parent-awareness-spring', utm_content: 'carousel-team-photos', utm_ad_group: 'parents-25-45-socal', utm_creative: 'carousel-v3', utm_placement: 'feed', click_id_type: 'fbclid', channel_group: 'Paid Social' },
+  { utm_source: 'facebook', utm_medium: 'paid_social', utm_campaign: 'parent-awareness-spring', utm_content: 'video-testimonial', utm_ad_group: 'parents-25-45-socal', utm_creative: 'testimonial-coach-smith', utm_placement: 'feed', click_id_type: 'fbclid', channel_group: 'Paid Social' },
+  { utm_source: 'facebook', utm_medium: 'paid_social', utm_campaign: 'retargeting-visitors', utm_content: 'dpa-registration', utm_ad_group: 'website-visitors-14d', utm_creative: 'dynamic-product-ad', utm_placement: 'feed', click_id_type: 'fbclid', channel_group: 'Paid Social' },
+  // Facebook Organic
+  { utm_source: 'facebook', utm_medium: 'social', utm_content: 'shared-post', channel_group: 'Organic Social' },
+  // Instagram - Paid
+  { utm_source: 'instagram', utm_medium: 'paid_social', utm_campaign: 'coach-recruitment', utm_content: 'stories-ad', utm_ad_group: 'coaches-35-55', utm_creative: 'stories-coach-life', utm_placement: 'stories', click_id_type: 'fbclid', channel_group: 'Paid Social' },
+  { utm_source: 'instagram', utm_medium: 'paid_social', utm_campaign: 'parent-awareness-spring', utm_content: 'reels-highlight', utm_ad_group: 'parents-25-45-socal', utm_creative: 'reel-game-day', utm_placement: 'reels', click_id_type: 'fbclid', channel_group: 'Paid Social' },
+  // Instagram Organic
+  { utm_source: 'instagram', utm_medium: 'social', utm_content: 'bio-link', channel_group: 'Organic Social' },
+  // TikTok
+  { utm_source: 'tiktok', utm_medium: 'paid_social', utm_campaign: 'youth-sports-awareness', utm_content: 'coach-day-in-life', utm_ad_group: 'parents-interest-youth-sports', utm_creative: 'ugc-coach-vlog', utm_placement: 'for-you-feed', click_id_type: 'ttclid', channel_group: 'Paid Social' },
+  // Email
+  { utm_source: 'email', utm_medium: 'email', utm_campaign: 'spring-season-reminder', utm_content: 'cta-register-now', channel_group: 'Email' },
+  { utm_source: 'email', utm_medium: 'email', utm_campaign: 'welcome-series', utm_content: 'onboarding-step-2', channel_group: 'Email' },
+  { utm_source: 'email', utm_medium: 'email', utm_campaign: 'weekly-digest', utm_content: 'schedule-update', channel_group: 'Email' },
+  { utm_source: 'email', utm_medium: 'email', utm_campaign: 'win-back-30d-inactive', utm_content: 'miss-you-cta', channel_group: 'Email' },
+  // Partner / Referral
+  { utm_source: 'partner', utm_medium: 'referral', utm_campaign: 'riverside-parks-partnership', utm_content: 'website-banner', channel_group: 'Referral' },
+  { utm_source: 'partner', utm_medium: 'referral', utm_campaign: 'ymca-cross-promo', utm_content: 'newsletter-feature', channel_group: 'Referral' },
+  // Community / Organic Social
+  { utm_source: 'nextdoor', utm_medium: 'social', utm_campaign: 'community-post', channel_group: 'Organic Social' },
+  // SMS
+  { utm_source: 'sms', utm_medium: 'sms', utm_campaign: 'game-reminder', utm_content: 'game-tomorrow', channel_group: 'SMS' },
+  // Affiliate
+  { utm_source: 'affiliate', utm_medium: 'affiliate', utm_campaign: 'coach-referral-program', utm_content: 'referral-link', channel_group: 'Affiliate' },
 ];
 
 const LANDING_PAGES = [
@@ -223,12 +272,68 @@ interface PHEvent {
   timestamp: string;
 }
 
+function clickId(type: string): Record<string, string> {
+  const id = `${type}_${Math.random().toString(36).slice(2, 14)}`;
+  return { [type]: id };
+}
+
+function lifecycleStage(daysSinceSignup: number, engagementScore: number): string {
+  if (daysSinceSignup < 1) return 'signed_up';
+  if (daysSinceSignup < 3) return 'onboarded';
+  if (engagementScore >= 75) return 'power_user';
+  if (engagementScore >= 40) return 'engaged';
+  if (engagementScore >= 15) return 'activated';
+  if (engagementScore < 10 && daysSinceSignup > 14) return 'churning';
+  return 'activated';
+}
+
+function engagementScore(daysSinceSignup: number): number {
+  // Simulate realistic engagement: starts high (onboarding), dips, stabilizes
+  const base = Math.max(10, 80 - daysSinceSignup * 1.5);
+  const noise = randomBetween(-15, 15);
+  return Math.max(0, Math.min(100, Math.round(base + noise)));
+}
+
+function channelGroup(source: string, medium: string): string {
+  if (medium === 'cpc' || medium === 'ppc') return 'Paid Search';
+  if (medium === 'display') return 'Display';
+  if (medium === 'paid_social') return 'Paid Social';
+  if (medium === 'organic') return 'Organic Search';
+  if (medium === 'social') return 'Organic Social';
+  if (medium === 'email') return 'Email';
+  if (medium === 'referral') return 'Referral';
+  if (medium === 'sms') return 'SMS';
+  if (medium === 'affiliate') return 'Affiliate';
+  if (source === 'direct' || (!source && !medium)) return 'Direct';
+  return 'Unassigned';
+}
+
+/** Core event builder — every event gets user context, geo, device, and session attribution */
 function buildEvent(
   distinct_id: string,
   event: string,
   timestamp: string,
-  props: Record<string, unknown> = {}
+  props: Record<string, unknown> = {},
+  explicitUser?: UserProfile
 ): PHEvent {
+  // Auto-resolve user from lookup map if not explicitly passed
+  const user = explicitUser || USER_MAP.get(distinct_id);
+
+  const userContext = user ? {
+    // User context on every event (enables breakdown by any dimension)
+    user_role: user.role,
+    user_sport: user.sport,
+    user_org_type: user.org_type,
+    user_competition_level: user.competition_level,
+    user_city: user.city,
+    user_state: user.state,
+    user_zip_code: user.zip_code,
+    user_platform: user.platform,
+    user_signup_source: user.signup_source,
+    // Group keys for group analytics
+    $group_organization: user.org_id,
+  } : {};
+
   return {
     event,
     timestamp,
@@ -238,6 +343,7 @@ function buildEvent(
       $lib_version: '1.145.0',
       ...deviceProps(),
       ...geoProps(),
+      ...userContext,
       $referrer: pick(REFERRERS),
       ...props,
     },
@@ -249,32 +355,130 @@ function buildEvent(
 function signupEvents(user: UserProfile, timestamp: string): PHEvent[] {
   const sid = sessionId();
   const url = `${BASE_URL}/register`;
+  const firstTouchUtm = pick(UTM_CAMPAIGNS);
+  const signupMethod = pick(['email', 'google', 'apple']);
+
   return [
-    buildEvent(user.distinct_id, '$pageview', timestamp, { $current_url: url, $session_id: sid }),
+    buildEvent(user.distinct_id, '$pageview', timestamp, { $current_url: url, $session_id: sid }, user),
     buildEvent(user.distinct_id, 'user_signed_up', timestamp, {
       $current_url: url,
       $session_id: sid,
       role: user.role,
       org_name: user.org_name,
-      signup_method: pick(['email', 'google', 'apple']),
-    }),
+      signup_method: signupMethod,
+      sport: user.sport,
+      competition_level: user.competition_level,
+    }, user),
+    // $identify with $set (mutable) and $set_once (immutable first-touch) person properties
     buildEvent(user.distinct_id, '$identify', timestamp, {
-      $set: { email: user.email, name: user.name, role: user.role },
+      $set: {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        org_id: user.org_id,
+        org_name: user.org_name,
+        org_type: user.org_type,
+        sport: user.sport,
+        competition_level: user.competition_level,
+        city: user.city,
+        state: user.state,
+        zip_code: user.zip_code,
+        platform: user.platform,
+        teams_count: user.teams_count,
+        children_count: user.children_count || 0,
+        lifecycle_stage: 'signed_up',
+        engagement_score: 50,
+        engagement_tier: 'warm',
+        total_sessions: 1,
+        total_spend: 0,
+        registrations_completed: 0,
+        is_activated: false,
+        last_seen_at: timestamp,
+      },
+      $set_once: {
+        // First-touch attribution (locked forever)
+        $initial_utm_source: firstTouchUtm.utm_source,
+        $initial_utm_medium: firstTouchUtm.utm_medium,
+        $initial_utm_campaign: firstTouchUtm.utm_campaign || '',
+        $initial_channel_group: firstTouchUtm.channel_group,
+        initial_landing_page: url,
+        initial_device_type: pick(DEVICES),
+        initial_platform: user.platform,
+        signed_up_at: timestamp,
+        signup_method: signupMethod,
+        signup_source: user.signup_source,
+        first_sport: user.sport,
+        first_org_type: user.org_type,
+        first_competition_level: user.competition_level,
+      },
     }),
+    // Rich group identify for organizations
     buildEvent(user.distinct_id, '$groupidentify', timestamp, {
       $group_type: 'organization',
       $group_key: user.org_id,
-      $group_set: { name: user.org_name },
+      $group_set: {
+        name: user.org_name,
+        org_type: user.org_type,
+        sport: user.sport,
+        competition_level: user.competition_level,
+        city: user.city,
+        state: user.state,
+        zip_code: user.zip_code,
+        member_count: randomBetween(15, 120),
+        teams_count: user.teams_count,
+        created_at: timestamp,
+        plan: pick(['free', 'starter', 'pro']),
+        is_verified: true,
+      },
     }),
   ];
 }
 
-function loginEvent(user: UserProfile, timestamp: string): PHEvent {
-  return buildEvent(user.distinct_id, 'user_logged_in', timestamp, {
-    $current_url: `${BASE_URL}/login`,
-    login_method: pick(['email', 'google', 'apple']),
-    role: user.role,
-  });
+function loginEvent(user: UserProfile, timestamp: string, dayIndex: number): PHEvent[] {
+  const daysSinceSignup = dayIndex;
+  const score = engagementScore(daysSinceSignup);
+  const stage = lifecycleStage(daysSinceSignup, score);
+  const sessionNum = randomBetween(dayIndex + 1, dayIndex + 5);
+  const sessionUtm = utmProps(); // last-touch attribution on this session
+
+  return [
+    buildEvent(user.distinct_id, 'user_logged_in', timestamp, {
+      $current_url: `${BASE_URL}/login`,
+      login_method: pick(['email', 'google', 'apple']),
+      role: user.role,
+      session_number: sessionNum,
+      is_returning_user: daysSinceSignup > 0,
+      days_since_signup: daysSinceSignup,
+      // Last-touch attribution for this session
+      ...sessionUtm,
+    }, user),
+    // Update person properties on every login ($set = mutable)
+    buildEvent(user.distinct_id, '$set', timestamp, {
+      $set: {
+        last_seen_at: timestamp,
+        lifecycle_stage: stage,
+        engagement_score: score,
+        engagement_tier: score >= 75 ? 'power' : score >= 40 ? 'hot' : score >= 15 ? 'warm' : 'cold',
+        total_sessions: sessionNum,
+        days_since_signup: daysSinceSignup,
+        is_activated: daysSinceSignup > 3 && score > 20,
+        // Per-persona properties
+        ...(user.role === 'guardian' ? {
+          children_count: user.children_count || 1,
+          sports_enrolled: [user.sport],
+          calendar_subscribed: Math.random() > 0.4,
+        } : {}),
+        ...(user.role === 'coach' ? {
+          teams_coached_count: user.teams_count,
+          attendance_tracking_usage: Math.random() > 0.3,
+        } : {}),
+        ...(user.role === 'commissioner' ? {
+          leagues_managed_count: randomBetween(1, 3),
+          has_published_schedule: true,
+        } : {}),
+      },
+    }),
+  ];
 }
 
 function onboardingEvents(user: UserProfile, timestamp: string): PHEvent[] {
@@ -428,7 +632,7 @@ function teamManagementEvents(user: UserProfile, timestamp: string): PHEvent[] {
       $session_id: sid,
       team_name: team.name,
       sport: team.sport,
-    }));
+    }, user));
   }
 
   // Everyone can view teams
@@ -436,7 +640,7 @@ function teamManagementEvents(user: UserProfile, timestamp: string): PHEvent[] {
     $current_url: `${BASE_URL}/teams/${team.id}`,
     $session_id: sid,
     team_name: team.name,
-  }));
+  }, user));
 
   return events;
 }
@@ -748,6 +952,7 @@ function utmProps(): Record<string, unknown> {
     return {
       utm_source: 'direct',
       utm_medium: '(none)',
+      channel_group: 'Direct',
       $initial_referrer: '',
       $initial_referring_domain: '$direct',
     };
@@ -757,12 +962,23 @@ function utmProps(): Record<string, unknown> {
   const props: Record<string, unknown> = {
     utm_source: campaign.utm_source,
     utm_medium: campaign.utm_medium,
+    channel_group: campaign.channel_group,
     $initial_referrer: pick(refUrls),
     $initial_referring_domain: campaign.utm_source === 'email' ? '$direct' : `www.${campaign.utm_source}.com`,
   };
   if (campaign.utm_campaign) props.utm_campaign = campaign.utm_campaign;
   if (campaign.utm_content) props.utm_content = campaign.utm_content;
   if (campaign.utm_term) props.utm_term = campaign.utm_term;
+  // Extended attribution params
+  if (campaign.utm_ad_group) props.utm_ad_group = campaign.utm_ad_group;
+  if (campaign.utm_creative) props.utm_creative = campaign.utm_creative;
+  if (campaign.utm_placement) props.utm_placement = campaign.utm_placement;
+  if (campaign.utm_network) props.utm_network = campaign.utm_network;
+  if (campaign.utm_match_type) props.utm_match_type = campaign.utm_match_type;
+  // Ad platform click IDs
+  if (campaign.click_id_type) {
+    Object.assign(props, clickId(campaign.click_id_type));
+  }
   return props;
 }
 
@@ -1288,8 +1504,8 @@ async function main() {
     for (const user of activeUsers) {
       const ts = randomTimestamp(day);
 
-      // Login
-      allEvents.push(loginEvent(user, ts));
+      // Login (returns array now: login event + $set person properties)
+      allEvents.push(...loginEvent(user, ts, SEED_DAYS - d));
       dayEventCount++;
 
       // Browsing session
