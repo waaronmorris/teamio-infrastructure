@@ -94,7 +94,7 @@ final class DashboardViewModel {
             if user.role == .parent || user.role == .guardian {
                 do {
                     let portal: ParentDashboardResponse = try await APIClient.shared.request(.parentPortal(user.id))
-                    childrenTeamIds = Set((portal.children ?? []).compactMap { $0.team_id })
+                    childrenTeamIds = portal.childrenTeamIds
                 } catch {
                     print("[Dashboard] Parent portal: \(error)")
                 }
@@ -162,8 +162,8 @@ final class DashboardViewModel {
 
 struct DashboardView: View {
     @Environment(AuthManager.self) private var authManager
+    @Environment(UserRolesManager.self) private var rolesManager
     @State private var viewModel = DashboardViewModel()
-    @State private var rolesManager = UserRolesManager()
     @State private var showSearch = false
     @State private var showEditShortcuts = false
     @AppStorage("dashboardEventCount") private var dashboardEventCount = 10
@@ -226,9 +226,6 @@ struct DashboardView: View {
             }
             .task {
                 await viewModel.load(user: authManager.currentUser, rolesManager: rolesManager, eventLimit: dashboardEventCount)
-                if let user = authManager.currentUser, !rolesManager.isLoaded {
-                    await rolesManager.detectRoles(userId: user.id, primaryRole: user.role)
-                }
             }
         }
     }
@@ -381,7 +378,7 @@ struct DashboardView: View {
     private var upcomingEventsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Upcoming Events")
+                Text("Coming Up")
                     .font(.headline)
                 Spacer()
                 NavigationLink("See All") {
@@ -396,9 +393,9 @@ struct DashboardView: View {
                     .padding()
             } else if viewModel.taggedEvents.isEmpty {
                 ContentUnavailableView(
-                    "No Upcoming Events",
+                    "You're all caught up!",
                     systemImage: "calendar.badge.exclamationmark",
-                    description: Text("Check back when events are scheduled.")
+                    description: Text("No events scheduled. Enjoy the downtime!")
                 )
             } else {
                 LazyVStack(spacing: 8) {
@@ -446,9 +443,9 @@ struct DashboardView: View {
 
             if viewModel.teams.isEmpty && !viewModel.isLoading {
                 ContentUnavailableView(
-                    "No Teams",
+                    "No teams yet",
                     systemImage: "person.3",
-                    description: Text("You're not on any teams yet.")
+                    description: Text("Check back soon! Teams will appear once assigned.")
                 )
             } else {
                 LazyVStack(spacing: 8) {
@@ -724,4 +721,5 @@ struct EditShortcutsSheet: View {
 #Preview {
     DashboardView()
         .environment(AuthManager())
+        .environment(UserRolesManager())
 }

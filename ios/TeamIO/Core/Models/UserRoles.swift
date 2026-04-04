@@ -1,10 +1,7 @@
 import Foundation
 
-/// Manages the user's active roles. Since a single user can be a coach, parent, AND referee,
-/// this tracks all applicable roles and lets the user switch between them.
-///
-/// Detection strategy: Primary role from JWT + user self-declaration in settings.
-/// The backend restricts portal access by primary role, so we can't probe endpoints.
+/// Manages the user's active roles. A single user can be a coach, parent, AND referee.
+/// Detects roles automatically via backend endpoints + user self-declaration fallback.
 @Observable
 @MainActor
 final class UserRolesManager {
@@ -14,21 +11,47 @@ final class UserRolesManager {
     var refereeId: String?
     var isLoaded = false
 
-    /// Detect roles from primary + stored additional roles
+    /// Auto-detect roles by probing backend endpoints
     func detectRoles(userId: String, primaryRole: UserRole) async {
-        // Primary role
+        // Primary role is always set
         switch primaryRole {
         case .coach: isCoach = true
         case .parent, .guardian: isGuardian = true
-        case .admin, .commissioner: isCoach = false; isGuardian = false // admins see everything
         default: break
         }
 
-        // Load additional roles from UserDefaults (user self-declared)
-        let additionalRoles = UserDefaults.standard.stringArray(forKey: "additionalRoles_\(userId)") ?? []
-        if additionalRoles.contains("coach") { isCoach = true }
-        if additionalRoles.contains("parent") { isGuardian = true }
-        if additionalRoles.contains("referee") { isReferee = true }
+        // Load self-declared additional roles
+        let additional = UserDefaults.standard.stringArray(forKey: "additionalRoles_\(userId)") ?? []
+        if additional.contains("coach") { isCoach = true }
+        if additional.contains("parent") { isGuardian = true }
+        if additional.contains("referee") { isReferee = true }
+
+        // Auto-detect coach (if not already)
+        if !isCoach {
+            do {
+                let _: CoachProfile = try await APIClient.shared.request(.coachPortal(userId))
+                isCoach = true
+            } catch {}
+        }
+
+        // Auto-detect guardian (parent portal now accessible to all roles)
+        if !isGuardian {
+            do {
+                let portal: ParentDashboardResponse = try await APIClient.shared.request(.parentPortal(userId))
+                if let children = portal.children, !children.isEmpty {
+                    isGuardian = true
+                }
+            } catch {}
+        }
+
+        // Auto-detect referee via new endpoint
+        if !isReferee {
+            do {
+                let ref_profile: RefereePortalResponse = try await APIClient.shared.request(.refereePortal(userId))
+                isReferee = true
+                refereeId = ref_profile.referee_id
+            } catch {}
+        }
 
         isLoaded = true
     }

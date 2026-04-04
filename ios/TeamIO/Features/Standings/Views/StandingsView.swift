@@ -193,7 +193,7 @@ struct StandingsView: View {
                 .font(.headline)
 
             if viewModel.recentResults.isEmpty {
-                Text("No completed games")
+                Text("No results yet -- games are still being played!")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding()

@@ -102,9 +102,9 @@ struct MessagesView: View {
             } else if viewModel.conversations.isEmpty {
                 Spacer()
                 ContentUnavailableView(
-                    "No Messages",
+                    "All quiet here",
                     systemImage: "bubble.left.and.bubble.right",
-                    description: Text("Start a conversation with your team.")
+                    description: Text("Start a conversation with your team!")
                 )
                 Spacer()
             } else {
@@ -125,7 +125,7 @@ struct MessagesView: View {
             if viewModel.broadcasts.isEmpty {
                 Spacer()
                 ContentUnavailableView(
-                    "No Broadcasts",
+                    "No broadcasts yet",
                     systemImage: "megaphone",
                     description: Text("Announcements from your league will appear here.")
                 )

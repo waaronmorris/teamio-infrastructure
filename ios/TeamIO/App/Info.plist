@@ -51,5 +51,7 @@
 	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>TeamIO uses Face ID to quickly unlock the app.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>TeamIO uses your location to find sports programs near you.</string>
 </dict>
 </plist>

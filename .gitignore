@@ -10,6 +10,7 @@
 # Environment
 .env
 .env.local
+.envrc
 
 # Subdirectories with their own repos
 backend/

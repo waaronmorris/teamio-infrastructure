@@ -13,6 +13,8 @@ final class RegistrationViewModel {
     var error: String?
     var isSuccess = false
     var createdRegistrationId: String?
+    var waiverSigned = false
+    var paymentCompleted = false
 
     enum RegistrationMode: String, CaseIterable {
         case myself = "Register Myself"
@@ -75,6 +77,35 @@ final class RegistrationViewModel {
             self.error = error.localizedDescription
         }
         isSubmitting = false
+    }
+
+    func signWaiver() async {
+        guard let regId = createdRegistrationId else { return }
+        do {
+            try await APIClient.shared.requestVoid(.signWaiver(regId))
+            waiverSigned = true
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func checkout() async {
+        guard let regId = createdRegistrationId else { return }
+        struct CheckoutResponse: Decodable, Sendable {
+            let checkout_url: String?
+            let url: String?
+        }
+        do {
+            let resp: CheckoutResponse = try await APIClient.shared.request(.registrationCheckout(regId))
+            if let urlString = resp.checkout_url ?? resp.url, let url = URL(string: urlString) {
+                await MainActor.run {
+                    UIApplication.shared.open(url)
+                }
+                paymentCompleted = true // Optimistic — Stripe webhook will confirm
+            }
+        } catch {
+            self.error = error.localizedDescription
+        }
     }
 }
 
@@ -238,38 +269,111 @@ struct RegistrationView: View {
     }
 
     private var successView: some View {
-        VStack(spacing: AppTheme.spacingLG) {
-            Spacer()
+        ScrollView {
+            VStack(spacing: AppTheme.spacingLG) {
+                Spacer(minLength: 40)
 
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.green)
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 64))
+                    .foregroundStyle(.green)
 
-            Text("Registration Submitted!")
-                .font(.title2.bold())
+                Text("Registration Submitted!")
+                    .font(.title2.bold())
 
-            Text("Your registration is pending review. You'll be notified once it's approved.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+                Text("Your registration is pending review. You'll be notified once it's approved.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
 
-            VStack(spacing: 12) {
-                Button("Register Another") {
-                    viewModel.isSuccess = false
-                    viewModel.selectedPlayerId = nil
-                    viewModel.createdRegistrationId = nil
+                // Next steps
+                VStack(alignment: .leading, spacing: 16) {
+                    // Step 1: Sign waiver
+                    HStack(spacing: 12) {
+                        Image(systemName: viewModel.waiverSigned ? "checkmark.circle.fill" : "1.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(viewModel.waiverSigned ? .green : Color.accentColor)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sign Waiver")
+                                .font(.subheadline.weight(.semibold))
+                            Text(viewModel.waiverSigned ? "Completed" : "Required before playing")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        if !viewModel.waiverSigned {
+                            Button("Sign") {
+                                Task { await viewModel.signWaiver() }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
+                        }
+                    }
+
+                    Divider()
+
+                    // Step 2: Payment
+                    HStack(spacing: 12) {
+                        Image(systemName: viewModel.paymentCompleted ? "checkmark.circle.fill" : "2.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(viewModel.paymentCompleted ? .green : Color.accentColor)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Payment")
+                                .font(.subheadline.weight(.semibold))
+                            if viewModel.paymentCompleted {
+                                Text("Paid")
+                                    .font(.caption)
+                                    .foregroundStyle(.green)
+                            } else {
+                                Text("Complete payment to finalize registration")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Spacer()
+                        if !viewModel.paymentCompleted {
+                            Button("Pay Now") {
+                                Task { await viewModel.checkout() }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
+                        }
+                    }
+
+                    Divider()
+
+                    // Step 3: Approval
+                    HStack(spacing: 12) {
+                        Image(systemName: "3.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Commissioner Approval")
+                                .font(.subheadline.weight(.semibold))
+                            Text("Pending review by your league")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        StatusBadge(text: "Pending", color: .orange)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
+                .cardStyle()
 
-                Button("Done") {
-                    // Pop to dashboard
+                VStack(spacing: 12) {
+                    Button("Register Another") {
+                        viewModel.isSuccess = false
+                        viewModel.selectedPlayerId = nil
+                        viewModel.createdRegistrationId = nil
+                        viewModel.waiverSigned = false
+                        viewModel.paymentCompleted = false
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
+
+                Spacer(minLength: 40)
             }
-
-            Spacer()
+            .padding()
         }
-        .padding()
     }
 }
 

@@ -93,8 +93,8 @@ final class ScheduleViewModel {
 
 struct ScheduleView: View {
     @Environment(AuthManager.self) private var authManager
+    @Environment(UserRolesManager.self) private var rolesManager
     @State private var viewModel = ScheduleViewModel()
-    @State private var rolesManager = UserRolesManager()
 
     /// Resolve team IDs per role for tagging
     private func loadTeamIds() async -> (coached: Set<String>, children: Set<String>, player: Set<String>) {
@@ -112,7 +112,7 @@ struct ScheduleView: View {
         if user.role == .parent || user.role == .guardian {
             do {
                 let portal: ParentDashboardResponse = try await APIClient.shared.request(.parentPortal(user.id))
-                children = Set((portal.children ?? []).compactMap { $0.team_id })
+                children = portal.childrenTeamIds
             } catch {}
         }
         if user.role == .player {
@@ -142,9 +142,9 @@ struct ScheduleView: View {
                 } else if viewModel.filteredEvents.isEmpty {
                     Spacer()
                     ContentUnavailableView(
-                        "No Events",
+                        "You're all caught up!",
                         systemImage: "calendar.badge.exclamationmark",
-                        description: Text("No \(viewModel.selectedFilter.rawValue.lowercased()) events found.")
+                        description: Text("No \(viewModel.selectedFilter.rawValue.lowercased()) events scheduled.")
                     )
                     Spacer()
                 } else {
@@ -191,9 +191,6 @@ struct ScheduleView: View {
                 await viewModel.load(user: authManager.currentUser, coachedTeamIds: ids.coached, childrenTeamIds: ids.children, playerTeamIds: ids.player)
             }
             .task {
-                if let user = authManager.currentUser, !rolesManager.isLoaded {
-                    await rolesManager.detectRoles(userId: user.id, primaryRole: user.role)
-                }
                 let ids = await loadTeamIds()
                 await viewModel.load(user: authManager.currentUser, coachedTeamIds: ids.coached, childrenTeamIds: ids.children, playerTeamIds: ids.player)
             }
@@ -204,4 +201,5 @@ struct ScheduleView: View {
 #Preview {
     ScheduleView()
         .environment(AuthManager())
+        .environment(UserRolesManager())
 }

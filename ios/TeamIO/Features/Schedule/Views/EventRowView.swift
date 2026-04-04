@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EventRowView: View {
     let event: ScheduledEvent
+    var onRsvp: ((String, String) -> Void)?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -46,6 +47,29 @@ struct EventRowView: View {
             }
 
             Spacer()
+
+            // Quick RSVP buttons for upcoming game events
+            if let onRsvp, event.isUpcoming && event.isGame {
+                HStack(spacing: 6) {
+                    Button {
+                        onRsvp(event.id, "accepted")
+                    } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.green)
+                    }
+                    .buttonStyle(.plain)
+
+                    Button {
+                        onRsvp(event.id, "declined")
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.red)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
 
             // Status
             StatusBadge(

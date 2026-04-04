@@ -92,10 +92,62 @@ struct InboxResponse: Decodable, Sendable {
 
 struct ParentDashboardResponse: Decodable, Sendable {
     let guardian: Guardian?
-    let children: [Player]?
+    let children: [ChildInfo]?
     let family_schedule: [ScheduledEvent]?
     let pending_registrations: [Registration]?
     let unread_messages: Int?
+
+    /// Convenience: extract all team IDs from all children
+    var childrenTeamIds: Set<String> {
+        Set((children ?? []).flatMap { $0.teams.map { $0.id } })
+    }
+
+    /// Convenience: convert children to Player-like objects for display
+    var childrenAsPlayers: [Player] {
+        (children ?? []).map { child in
+            Player(
+                id: child.player.id,
+                user_id: nil,
+                team_id: child.teams.first?.id,
+                jersey_number: child.player.jersey_number,
+                position: child.player.position,
+                status: nil,
+                first_name: nil,
+                last_name: nil,
+                date_of_birth: nil,
+                name: child.player.name,
+                joined_at: nil,
+                created_at: nil,
+                updated_at: nil,
+                user: nil,
+                team: child.teams.first.map { PlayerTeamRef(id: $0.id, name: $0.name) }
+            )
+        }
+    }
+}
+
+struct ChildInfo: Decodable, Sendable, Identifiable {
+    let player: ChildPlayerInfo
+    let teams: [ChildTeamInfo]
+    let upcoming_events_count: Int?
+    let is_primary_guardian: Bool?
+
+    var id: String { player.id }
+}
+
+struct ChildPlayerInfo: Decodable, Sendable {
+    let id: String
+    let name: String
+    let jersey_number: String?
+    let position: String?
+}
+
+struct ChildTeamInfo: Decodable, Sendable {
+    let id: String
+    let name: String
+    let league_name: String?
+    let coach_name: String?
+    let coach_contact: String?
 }
 
 struct PlayerDashboardResponse: Decodable, Sendable {
@@ -109,6 +161,19 @@ struct PlayerDashboardResponse: Decodable, Sendable {
 struct PlayerStatsSummary: Decodable, Sendable {
     let games_played: Int?
     let stats: [String: Double]?
+}
+
+struct RefereePortalResponse: Decodable, Sendable {
+    let referee_id: String
+    let user_id: String
+    let first_name: String
+    let last_name: String
+    let email: String?
+    let phone: String?
+    let certification_level: String?
+    let is_active: Bool
+    let assignment_count: Int
+    let total_earned_cents: Int
 }
 
 struct CoachProfile: Decodable, Sendable {

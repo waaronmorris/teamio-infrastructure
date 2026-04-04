@@ -27,7 +27,7 @@ struct OnboardingView: View {
         OnboardingPage(
             icon: "person.3.fill",
             title: "Team Management",
-            description: "Manage rosters, run drafts, track player stats, and communicate with your team all in one place.",
+            description: "Whether you coach, parent, referee, or play -- see everything in one place. Manage rosters, track stats, and stay connected.",
             color: .green
         ),
         OnboardingPage(

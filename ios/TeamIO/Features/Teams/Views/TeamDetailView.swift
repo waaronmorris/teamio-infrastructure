@@ -111,7 +111,7 @@ struct TeamDetailView: View {
             }
 
             if viewModel.roster.isEmpty && !viewModel.isLoading {
-                Text("No players on roster")
+                Text("Roster is empty -- players will appear once added.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)

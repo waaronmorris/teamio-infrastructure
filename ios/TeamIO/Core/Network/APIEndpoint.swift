@@ -230,6 +230,10 @@ extension APIEndpoint {
     static func coachPortal(_ userId: String) -> APIEndpoint {
         APIEndpoint("/users/\(userId)/coach")
     }
+
+    static func refereePortal(_ userId: String) -> APIEndpoint {
+        APIEndpoint("/users/\(userId)/referee")
+    }
 }
 
 // MARK: - Notification Endpoints
@@ -276,11 +280,35 @@ extension APIEndpoint {
     }
 }
 
-// MARK: - Registration Creation
+// MARK: - Registration Endpoints
 
 extension APIEndpoint {
     static func createRegistration() -> APIEndpoint {
         APIEndpoint("/registrations", method: .post)
+    }
+
+    static func approveRegistration(_ id: String) -> APIEndpoint {
+        APIEndpoint("/registrations/\(id)/approve", method: .post)
+    }
+
+    static func waitlistRegistration(_ id: String) -> APIEndpoint {
+        APIEndpoint("/registrations/\(id)/waitlist", method: .post)
+    }
+
+    static func cancelRegistration(_ id: String) -> APIEndpoint {
+        APIEndpoint("/registrations/\(id)/cancel", method: .post)
+    }
+
+    static func signWaiver(_ id: String) -> APIEndpoint {
+        APIEndpoint("/registrations/\(id)/sign-waiver", method: .post)
+    }
+
+    static func registrationCheckout(_ id: String) -> APIEndpoint {
+        APIEndpoint("/registrations/\(id)/checkout", method: .post)
+    }
+
+    static func updateRegistration(_ id: String) -> APIEndpoint {
+        APIEndpoint("/registrations/\(id)", method: .put)
     }
 }
 
@@ -433,5 +461,37 @@ extension APIEndpoint {
 extension APIEndpoint {
     static func refereesList() -> APIEndpoint {
         APIEndpoint("/referees")
+    }
+}
+
+// MARK: - Discovery Endpoints (Public)
+
+extension APIEndpoint {
+    static func discoverOrganizations(lat: Double, lng: Double, radiusMiles: Int = 15) -> APIEndpoint {
+        APIEndpoint("/discover/organizations?latitude=\(lat)&longitude=\(lng)&radius_miles=\(radiusMiles)", requiresAuth: false)
+    }
+
+    static func discoverOrganization(_ id: String) -> APIEndpoint {
+        APIEndpoint("/discover/organizations/\(id)", requiresAuth: false)
+    }
+
+    static func geocodeZip(_ zip: String) -> APIEndpoint {
+        APIEndpoint("/geocode/zip/\(zip)", requiresAuth: false)
+    }
+
+    static func createJoinRequest() -> APIEndpoint {
+        APIEndpoint("/join-requests", method: .post)
+    }
+
+    static func listJoinRequests(orgId: String) -> APIEndpoint {
+        APIEndpoint("/join-requests?organization_id=\(orgId)")
+    }
+
+    static func approveJoinRequest(_ id: String) -> APIEndpoint {
+        APIEndpoint("/join-requests/\(id)/approve", method: .post)
+    }
+
+    static func rejectJoinRequest(_ id: String) -> APIEndpoint {
+        APIEndpoint("/join-requests/\(id)/reject", method: .post)
     }
 }

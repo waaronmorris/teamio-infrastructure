@@ -1,0 +1,25 @@
+{
+  "name": "teamio-qa-chaos-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/agent.ts",
+    "start:headless": "HEADLESS=true tsx src/agent.ts",
+    "start:github": "FILE_GITHUB_ISSUES=true HEADLESS=true tsx src/agent.ts",
+    "start:github:dry": "FILE_GITHUB_ISSUES=true DRY_RUN=true tsx src/agent.ts",
+    "start:full": "FILE_GITHUB_ISSUES=true HEADLESS=true ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY tsx src/agent.ts",
+    "review": "tsx src/posthog-reviewer.ts",
+    "review:file": "FILE_GITHUB_ISSUES=true tsx src/posthog-reviewer.ts",
+    "seed-events": "tsx src/seed-posthog-events.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "playwright": "^1.52.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}

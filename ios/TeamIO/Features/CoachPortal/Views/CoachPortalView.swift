@@ -387,7 +387,7 @@ struct CoachPortalView: View {
                         Image(systemName: "person.3")
                             .font(.title2)
                             .foregroundStyle(.tertiary)
-                        Text("No players on roster")
+                        Text("Roster is empty -- players will appear once added.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -442,7 +442,7 @@ struct CoachPortalView: View {
             if viewModel.selectedTeamUpcoming.isEmpty {
                 HStack {
                     Spacer()
-                    Text("No upcoming events")
+                    Text("You're all caught up! No events scheduled.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding()
@@ -513,7 +513,7 @@ struct CoachPortalView: View {
             if viewModel.selectedTeamResults.isEmpty {
                 HStack {
                     Spacer()
-                    Text("No completed games yet")
+                    Text("No results yet -- games are still being played!")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .padding()

@@ -115,7 +115,7 @@ struct PlayerPortalView: View {
                 .font(.headline)
 
             if viewModel.upcomingEvents.isEmpty {
-                Text("No upcoming events")
+                Text("You're all caught up! No events scheduled.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding()
@@ -195,7 +195,7 @@ struct PlayerPortalView: View {
                 .font(.headline)
 
             if viewModel.recentResults.isEmpty {
-                Text("No completed games yet")
+                Text("No results yet -- games are still being played!")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding()

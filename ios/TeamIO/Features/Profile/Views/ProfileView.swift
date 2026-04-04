@@ -2,8 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(AuthManager.self) private var authManager
-    @State private var rolesManager = UserRolesManager()
-    @AppStorage("activeViewMode") private var activeViewMode = "auto"
+    @Environment(UserRolesManager.self) private var rolesManager
 
     var body: some View {
         NavigationStack {
@@ -19,76 +18,67 @@ struct ProfileView: View {
                                 Text(user.email)
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-                                StatusBadge(text: user.role.displayName, color: Color.accentColor)
+                                // Show all detected roles
+                                HStack(spacing: 4) {
+                                    StatusBadge(text: user.role.displayName, color: Color.accentColor)
+                                    if rolesManager.isCoach && user.role != .coach {
+                                        StatusBadge(text: "Coach", color: .teal)
+                                    }
+                                    if rolesManager.isGuardian && user.role != .parent && user.role != .guardian {
+                                        StatusBadge(text: "Parent", color: .pink)
+                                    }
+                                    if rolesManager.isReferee {
+                                        StatusBadge(text: "Referee", color: .purple)
+                                    }
+                                }
                             }
                         }
                         .padding(.vertical, 4)
                     }
                 }
 
-                // My Roles — let user declare additional roles and switch between them
-                Section("My Roles") {
-                    // Primary role (read-only)
-                    HStack {
-                        Label(authManager.currentUser?.role.displayName ?? "", systemImage: authManager.currentUser?.role.icon ?? "person")
-                        Spacer()
-                        Text("Primary")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    // Additional role toggles
-                    if authManager.currentUser?.role != .coach {
-                        Toggle(isOn: Binding(
-                            get: { rolesManager.isCoach },
-                            set: { newVal in
-                                rolesManager.isCoach = newVal
-                                saveRoles()
-                            }
-                        )) {
-                            Label("I'm also a Coach", systemImage: "megaphone.fill")
+                // My Roles — auto-detected, with manual override for undetected
+                if rolesManager.isLoaded {
+                    Section("My Roles") {
+                        // Show detected roles as confirmed
+                        if rolesManager.isCoach {
+                            Label("Coach", systemImage: "megaphone.fill")
+                                .foregroundStyle(.teal)
                         }
-                    }
-
-                    if authManager.currentUser?.role != .parent && authManager.currentUser?.role != .guardian {
-                        Toggle(isOn: Binding(
-                            get: { rolesManager.isGuardian },
-                            set: { newVal in
-                                rolesManager.isGuardian = newVal
-                                saveRoles()
-                            }
-                        )) {
-                            Label("I'm also a Parent", systemImage: "figure.2.and.child.holdinghands")
+                        if rolesManager.isGuardian {
+                            Label("Parent", systemImage: "figure.2.and.child.holdinghands")
+                                .foregroundStyle(.pink)
                         }
-                    }
-
-                    Toggle(isOn: Binding(
-                        get: { rolesManager.isReferee },
-                        set: { newVal in
-                            rolesManager.isReferee = newVal
-                            saveRoles()
-                        }
-                    )) {
-                        Label("I'm also a Referee", systemImage: "flag.fill")
-                    }
-                }
-
-                // View mode switcher (always available for multi-role users)
-                if rolesManager.isLoaded && rolesManager.hasMultipleRoles {
-                    Section("Active View") {
-                        Picker("Navigate as", selection: $activeViewMode) {
-                            Text("\(authManager.currentUser?.role.displayName ?? "Auto")").tag("auto")
-                            if rolesManager.isCoach && authManager.currentUser?.role != .coach {
-                                Text("Coach").tag("coach")
-                            }
-                            if rolesManager.isGuardian && authManager.currentUser?.role != .parent && authManager.currentUser?.role != .guardian {
-                                Text("Parent").tag("parent")
-                            }
+                        if rolesManager.isReferee {
+                            Label("Referee", systemImage: "flag.fill")
+                                .foregroundStyle(.purple)
                         }
 
-                        Text("Changes which portal appears in the tab bar and how data is filtered.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        // Only show toggles for roles NOT auto-detected
+                        if !rolesManager.isCoach && authManager.currentUser?.role != .coach {
+                            Toggle(isOn: Binding(
+                                get: { rolesManager.isCoach },
+                                set: { newVal in rolesManager.isCoach = newVal; saveRoles() }
+                            )) {
+                                Label("I'm also a Coach", systemImage: "megaphone.fill")
+                            }
+                        }
+                        if !rolesManager.isGuardian && authManager.currentUser?.role != .parent && authManager.currentUser?.role != .guardian {
+                            Toggle(isOn: Binding(
+                                get: { rolesManager.isGuardian },
+                                set: { newVal in rolesManager.isGuardian = newVal; saveRoles() }
+                            )) {
+                                Label("I'm also a Parent", systemImage: "figure.2.and.child.holdinghands")
+                            }
+                        }
+                        if !rolesManager.isReferee {
+                            Toggle(isOn: Binding(
+                                get: { rolesManager.isReferee },
+                                set: { newVal in rolesManager.isReferee = newVal; saveRoles() }
+                            )) {
+                                Label("I'm also a Referee", systemImage: "flag.fill")
+                            }
+                        }
                     }
                 }
 
@@ -103,36 +93,6 @@ struct ProfileView: View {
                             }
                             .font(.subheadline)
                         }
-                    }
-                }
-
-                // Quick portal links
-                Section("Portals") {
-                    if rolesManager.isCoach {
-                        NavigationLink {
-                            CoachPortalView()
-                        } label: {
-                            Label("Coach Portal", systemImage: "megaphone.fill")
-                        }
-                    }
-                    if rolesManager.isGuardian {
-                        NavigationLink {
-                            ParentPortalView()
-                        } label: {
-                            Label("Parent Portal", systemImage: "figure.2.and.child.holdinghands")
-                        }
-                    }
-                    if authManager.currentUser?.role == .player {
-                        NavigationLink {
-                            PlayerPortalView()
-                        } label: {
-                            Label("Player Portal", systemImage: "figure.run")
-                        }
-                    }
-                    NavigationLink {
-                        MessagesView()
-                    } label: {
-                        Label("Messages", systemImage: "bubble.left.and.bubble.right.fill")
                     }
                 }
 
@@ -170,9 +130,7 @@ struct ProfileView: View {
                 // Logout
                 Section {
                     Button(role: .destructive) {
-                        Task {
-                            await authManager.logout()
-                        }
+                        Task { await authManager.logout() }
                     } label: {
                         HStack {
                             Spacer()
@@ -199,11 +157,6 @@ struct ProfileView: View {
                 .listRowBackground(Color.clear)
             }
             .navigationTitle("Profile")
-            .task {
-                if let user = authManager.currentUser, !rolesManager.isLoaded {
-                    await rolesManager.detectRoles(userId: user.id, primaryRole: user.role)
-                }
-            }
         }
     }
 
@@ -220,4 +173,5 @@ struct ProfileView: View {
 #Preview {
     ProfileView()
         .environment(AuthManager())
+        .environment(UserRolesManager())
 }

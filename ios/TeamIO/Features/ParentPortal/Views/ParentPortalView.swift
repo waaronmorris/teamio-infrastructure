@@ -3,7 +3,7 @@ import SwiftUI
 @Observable
 @MainActor
 final class ParentPortalViewModel {
-    var children: [Player] = []
+    var children: [ChildInfo] = []
     var registrations: [Registration] = []
     var upcomingEvents: [ScheduledEvent] = []
     var isLoading = false
@@ -85,17 +85,17 @@ struct ParentPortalView: View {
 
             if viewModel.children.isEmpty && !viewModel.isLoading {
                 ContentUnavailableView(
-                    "No Players",
+                    "No players yet",
                     systemImage: "person.badge.plus",
-                    description: Text("Register a player to get started.")
+                    description: Text("Register a player to get started!")
                 )
             } else {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                    ForEach(viewModel.children) { player in
+                    ForEach(viewModel.children) { child in
                         NavigationLink {
-                            PlayerDetailView(playerId: player.id)
+                            PlayerDetailView(playerId: child.player.id)
                         } label: {
-                            PlayerCard(player: player)
+                            ChildCard(child: child)
                         }
                         .buttonStyle(.plain)
                     }
@@ -132,7 +132,7 @@ struct ParentPortalView: View {
                 .font(.headline)
 
             if viewModel.upcomingEvents.isEmpty && !viewModel.isLoading {
-                Text("No upcoming events")
+                Text("You're all caught up! No events scheduled.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -153,19 +153,25 @@ struct ParentPortalView: View {
     }
 }
 
-struct PlayerCard: View {
-    let player: Player
+struct ChildCard: View {
+    let child: ChildInfo
 
     var body: some View {
         VStack(spacing: 8) {
-            AvatarView(name: player.displayName, size: 48)
-            Text(player.displayName)
+            AvatarView(name: child.player.name, size: 48)
+            Text(child.player.name)
                 .font(.subheadline.weight(.medium))
                 .lineLimit(1)
-            if let jersey = player.jerseyDisplay {
-                Text(jersey)
+            if let jersey = child.player.jersey_number {
+                Text("#\(jersey)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+            if let team = child.teams.first {
+                Text(team.name)
+                    .font(.caption2)
+                    .foregroundStyle(.pink)
+                    .lineLimit(1)
             }
         }
         .frame(maxWidth: .infinity)

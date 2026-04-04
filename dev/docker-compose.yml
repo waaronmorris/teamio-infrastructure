@@ -37,6 +37,7 @@ services:
       SERVER_PORT: 8080
       # Multi-tenancy: allow all origins in dev (set to https://*.getteamio.com in production)
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
     ports:
       - "8082:8080"
     healthcheck:
@@ -78,10 +79,46 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  # QA Chaos Agent (on-demand - use `docker compose run qa-agent`)
+  qa-agent:
+    build:
+      context: ./qa-chaos-agent
+      dockerfile: Dockerfile
+    container_name: teamio-qa-agent
+    profiles:
+      - qa
+    depends_on:
+      frontend:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    environment:
+      BASE_URL: http://frontend:80
+      API_URL: http://backend:8080
+      HEADLESS: "true"
+      MAX_DURATION: ${QA_MAX_DURATION:-300000}
+      MAX_PAGES: ${QA_MAX_PAGES:-50}
+      ACTION_DELAY: ${QA_ACTION_DELAY:-1000}
+      # GitHub issue filing (optional)
+      FILE_GITHUB_ISSUES: ${FILE_GITHUB_ISSUES:-false}
+      DRY_RUN: ${DRY_RUN:-false}
+      GITHUB_REPO: ${GITHUB_REPO:-waaronmorris/teamio}
+      GITHUB_MIN_SEVERITY: ${GITHUB_MIN_SEVERITY:-warning}
+      GH_TOKEN: ${GH_TOKEN:-}
+      # Claude AI analysis (optional)
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # PostHog error collection (optional)
+      POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
+      POSTHOG_PROJECT_ID: ${POSTHOG_PROJECT_ID:-}
+      POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
+    volumes:
+      - qa_reports:/app/reports
+
 volumes:
   postgres_data:
   pgadmin_data:
   uploads_data:
+  qa_reports:
 
 networks:
   default:

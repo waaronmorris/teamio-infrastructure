@@ -1,223 +1,141 @@
 import SwiftUI
 
-@Observable
-@MainActor
-final class TeamsViewModel {
-    var myTeams: [Team] = []
-    var allTeams: [Team] = []
-    var allEvents: [ScheduledEvent] = []
-    var seasons: [Season] = []
-    var registrations: [Registration] = []
-    var isLoading = false
-    var error: String?
-    var searchText = ""
-
-    // Commissioner stats
-    var totalPlayers: Int { allTeams.compactMap { $0.player_count }.reduce(0, +) }
-    var upcomingGames: [ScheduledEvent] { allEvents.filter { $0.isUpcoming && $0.isGame }.sorted { $0.start_time < $1.start_time } }
-    var completedGames: [ScheduledEvent] { allEvents.filter { $0.status == "completed" && $0.isGame }.sorted { $0.start_time > $1.start_time } }
-
-    var filteredTeams: [Team] {
-        let source = myTeams.isEmpty ? allTeams : myTeams
-        if searchText.isEmpty { return source }
-        return source.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-    }
-
-    func load(user: User?) async {
-        guard !isLoading else { return }
-        isLoading = true
-        error = nil
-
-        // Fetch teams
-        do {
-            let response: TeamsResponse = try await APIClient.shared.request(
-                .teams(), queryItems: [URLQueryItem(name: "per_page", value: "50")]
-            )
-            self.allTeams = response.teams
-        } catch {
-            print("[Teams] teams decode error: \(error)")
-        }
-
-        // Scope teams by role
-        if let user {
-            switch user.role {
-            case .coach:
-                self.myTeams = allTeams.filter { $0.coach?.user_id == user.id }
-            case .parent, .guardian:
-                // Fetch children's team IDs
-                do {
-                    let portal: ParentDashboardResponse = try await APIClient.shared.request(.parentPortal(user.id))
-                    let childTeamIds = Set((portal.children ?? []).compactMap { $0.team_id })
-                    if !childTeamIds.isEmpty {
-                        self.myTeams = allTeams.filter { childTeamIds.contains($0.id) }
-                    } else {
-                        self.myTeams = allTeams
-                    }
-                } catch {
-                    print("[Teams] parent portal decode error: \(error)")
-                    self.myTeams = allTeams
-                }
-            case .player:
-                do {
-                    let portal: PlayerDashboardResponse = try await APIClient.shared.request(.playerPortal(user.id))
-                    let playerTeamIds = Set((portal.teams ?? []).map { $0.id })
-                    if !playerTeamIds.isEmpty {
-                        self.myTeams = allTeams.filter { playerTeamIds.contains($0.id) }
-                    } else {
-                        self.myTeams = allTeams
-                    }
-                } catch {
-                    print("[Teams] player portal decode error: \(error)")
-                    self.myTeams = allTeams
-                }
-            default:
-                self.myTeams = allTeams
-            }
-        } else {
-            self.myTeams = allTeams
-        }
-
-        // Commissioner/Admin: also fetch events, seasons, registrations for dashboard
-        if let role = user?.role, role == .commissioner || role == .admin {
-            do {
-                let eventsResp: EventsResponse = try await APIClient.shared.request(
-                    .events(), queryItems: [URLQueryItem(name: "per_page", value: "200")]
-                )
-                self.allEvents = eventsResp.events
-            } catch {
-                print("[Teams] events decode error: \(error)")
-            }
-
-            do {
-                let seasonsResp: SeasonsResponse = try await APIClient.shared.request(.seasons())
-                self.seasons = seasonsResp.seasons
-            } catch {
-                print("[Teams] seasons decode error: \(error)")
-            }
-        }
-
-        isLoading = false
-    }
-}
-
+/// "My Hub" — a personal command center showing only what's relevant to the user.
+/// No "browse all teams." Each section maps to a role the user has.
 struct TeamsView: View {
     @Environment(AuthManager.self) private var authManager
-    @State private var viewModel = TeamsViewModel()
-    @State private var showAllTeams = false
+    @Environment(UserRolesManager.self) private var rolesManager
+    @State private var coachData = CoachHubData()
+    @State private var parentData = ParentHubData()
+    @State private var refereeData = RefereeHubData()
+    @State private var adminData = AdminHubData()
+    @State private var playerData = PlayerHubData()
+    @State private var isLoading = false
+    @State private var showBroadcastSheet = false
 
     var body: some View {
         NavigationStack {
-            Group {
-                if viewModel.isLoading && viewModel.allTeams.isEmpty {
-                    ProgressView("Loading...")
-                } else {
-                    roleBasedContent
-                }
-            }
-            .navigationTitle(tabTitle)
-            .searchable(text: $viewModel.searchText, prompt: "Search teams")
-            .navigationDestination(for: Team.self) { team in
-                TeamDetailView(teamId: team.id)
-            }
-            .navigationDestination(for: ScheduledEvent.self) { event in
-                EventDetailView(eventId: event.id)
-            }
-            .refreshable {
-                await viewModel.load(user: authManager.currentUser)
-            }
-            .task {
-                await viewModel.load(user: authManager.currentUser)
-            }
-        }
-    }
-
-    private var tabTitle: String {
-        switch authManager.currentUser?.role {
-        case .coach: return "My Teams"
-        case .parent, .guardian: return "Family"
-        case .commissioner: return "League"
-        case .admin: return "Organization"
-        default: return "Teams"
-        }
-    }
-
-    @ViewBuilder
-    private var roleBasedContent: some View {
-        switch authManager.currentUser?.role {
-        case .commissioner, .admin:
-            commissionerDashboard
-        case .coach:
-            coachTeamsList
-        default:
-            defaultTeamsList
-        }
-    }
-
-    // MARK: - Commissioner Dashboard
-
-    private var commissionerDashboard: some View {
-        ScrollView {
-            VStack(spacing: AppTheme.spacingLG) {
-                // Stats overview
-                HStack(spacing: 12) {
-                    StatCard(icon: "person.3.fill", value: "\(viewModel.allTeams.count)", label: "Teams")
-                    StatCard(icon: "figure.run", value: "\(viewModel.totalPlayers)", label: "Players")
-                    StatCard(icon: "calendar", value: "\(viewModel.upcomingGames.count)", label: "Upcoming")
-                }
-
-                // Active season
-                if let activeSeason = viewModel.seasons.first(where: { $0.status.isActive }) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Active Season")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text(activeSeason.name)
-                                .font(.headline)
+            ScrollView {
+                VStack(spacing: AppTheme.spacingLG) {
+                    if isLoading {
+                        ProgressView("Loading...")
+                            .padding(.top, 40)
+                    } else {
+                        // Coach section
+                        if rolesManager.isCoach {
+                            coachSection
                         }
-                        Spacer()
-                        StatusBadge(text: activeSeason.status.displayName, color: .green)
+
+                        // Parent section
+                        if rolesManager.isGuardian {
+                            parentSection
+                        }
+
+                        // Referee section
+                        if rolesManager.isReferee {
+                            refereeSection
+                        }
+
+                        // Commissioner/Admin section
+                        if authManager.currentUser?.role == .commissioner || authManager.currentUser?.role == .admin {
+                            adminSection
+                        }
+
+                        // Empty state if nothing loaded
+                        if !rolesManager.isCoach && !rolesManager.isGuardian && !rolesManager.isReferee
+                            && authManager.currentUser?.role != .commissioner && authManager.currentUser?.role != .admin {
+                            playerSection
+                        }
                     }
-                    .cardStyle()
                 }
-
-                // This week's games
-                thisWeeksGames
-
-                // Recent results
-                if !viewModel.completedGames.isEmpty {
-                    recentResultsSection
-                }
-
-                // All teams
-                allTeamsSection
+                .padding()
             }
-            .padding()
+            .navigationTitle("My Hub")
+            .refreshable { await loadAll() }
+            .task { await loadAll() }
+            .sheet(isPresented: $showBroadcastSheet) {
+                ComposeMessageSheet()
+            }
         }
     }
 
-    private var thisWeeksGames: some View {
+    private func loadAll() async {
+        isLoading = true
+        guard let user = authManager.currentUser else { isLoading = false; return }
+
+        await withTaskGroup(of: Void.self) { group in
+            if rolesManager.isCoach {
+                group.addTask { await coachData.load(userId: user.id) }
+            }
+            if rolesManager.isGuardian {
+                group.addTask { await parentData.load(userId: user.id) }
+            }
+            if rolesManager.isReferee {
+                group.addTask { await refereeData.load(userId: user.id) }
+            }
+            if user.role == .commissioner || user.role == .admin {
+                group.addTask { await adminData.load() }
+            }
+            // Always load player data for fallback section
+            group.addTask { await playerData.load(userId: user.id) }
+        }
+        isLoading = false
+    }
+
+    // MARK: - Coach Section
+
+    private var coachSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Upcoming Games")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("My Teams", systemImage: "megaphone.fill")
+                        .font(.headline)
+                        .foregroundStyle(.teal)
+                    Text("Tap to manage rosters and schedules")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
-                NavigationLink("See All") {
-                    ScheduleView()
+                NavigationLink("Coach Portal") {
+                    CoachPortalView()
                 }
                 .font(.subheadline)
+                .buttonStyle(.borderedProminent)
+                .tint(.teal)
+                .controlSize(.small)
             }
 
-            if viewModel.upcomingGames.isEmpty {
-                Text("No upcoming games")
+            if coachData.teams.isEmpty {
+                Text("No teams yet -- check back soon!")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
                     .padding()
             } else {
-                ForEach(viewModel.upcomingGames.prefix(5)) { event in
-                    NavigationLink(value: event) {
-                        EventRowView(event: event)
+                ForEach(coachData.teams) { team in
+                    NavigationLink {
+                        TeamDetailView(teamId: team.id)
+                    } label: {
+                        HStack(spacing: 12) {
+                            Circle()
+                                .fill(Color.teal.opacity(0.2))
+                                .frame(width: 40, height: 40)
+                                .overlay {
+                                    Text(String(team.name.prefix(2)).uppercased())
+                                        .font(.caption.bold())
+                                        .foregroundStyle(.teal)
+                                }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(team.name)
+                                    .font(.subheadline.weight(.semibold))
+                                Text("\(team.player_count ?? 0) players")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
                     }
                     .buttonStyle(.plain)
                 }
@@ -226,118 +144,371 @@ struct TeamsView: View {
         .cardStyle()
     }
 
-    private var recentResultsSection: some View {
+    // MARK: - Parent Section
+
+    private var parentSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Recent Results")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("My Family", systemImage: "figure.2.and.child.holdinghands")
+                        .font(.headline)
+                        .foregroundStyle(.pink)
+                    Text("Tap to view schedules and registrations")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
-                NavigationLink("Standings") {
-                    StandingsView()
+                NavigationLink("Family Portal") {
+                    ParentPortalView()
                 }
                 .font(.subheadline)
+                .buttonStyle(.borderedProminent)
+                .tint(.pink)
+                .controlSize(.small)
             }
 
-            ForEach(viewModel.completedGames.prefix(5)) { event in
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(event.displayTitle)
-                            .font(.subheadline.weight(.medium))
-                        Text(event.start_time.shortDate)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    if let score = event.scoreDisplay {
-                        Text(score)
-                            .font(.headline.monospacedDigit())
+            if parentData.children.isEmpty {
+                Text("No children linked yet -- register a player to get started!")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding()
+            } else {
+                ForEach(parentData.children) { child in
+                    HStack(spacing: 12) {
+                        AvatarView(name: child.player.name, size: 40)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(child.player.name)
+                                .font(.subheadline.weight(.semibold))
+                            if let pos = child.player.position {
+                                Text(pos.capitalized)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if let team = child.teams.first {
+                                Text(team.name)
+                                    .font(.caption2)
+                                    .foregroundStyle(.pink)
+                            }
+                        }
+                        Spacer()
+                        if let jersey = child.player.jersey_number {
+                            Text("#\(jersey)")
+                                .font(.caption.monospacedDigit().bold())
+                                .foregroundStyle(.pink)
+                        }
                     }
                 }
-                if event.id != viewModel.completedGames.prefix(5).last?.id {
-                    Divider()
+            }
+
+            if !parentData.pendingRegistrations.isEmpty {
+                Divider()
+                HStack {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundStyle(.orange)
+                    Text("\(parentData.pendingRegistrations.count) pending registration(s)")
+                        .font(.subheadline)
+                    Spacer()
                 }
             }
         }
         .cardStyle()
     }
 
-    private var allTeamsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("All Teams")
-                .font(.headline)
+    // MARK: - Referee Section
 
-            ForEach(viewModel.filteredTeams) { team in
-                NavigationLink(value: team) {
-                    TeamRowView(team: team)
+    private var refereeSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("Officiating", systemImage: "flag.fill")
+                        .font(.headline)
+                        .foregroundStyle(.purple)
+                    Text("Tap to manage assignments and availability")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                if let refId = rolesManager.refereeId {
+                    NavigationLink("Referee Portal") {
+                        RefereePortalView(refereeId: refId)
+                    }
+                    .font(.subheadline)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
+                    .controlSize(.small)
+                }
+            }
+
+            HStack(spacing: 16) {
+                VStack {
+                    Text("\(refereeData.assignmentCount)")
+                        .font(.title2.bold())
+                    Text("Assigned")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                VStack {
+                    Text(refereeData.earnedDisplay)
+                        .font(.title2.bold())
+                    Text("Earned")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                StatusBadge(text: refereeData.certification ?? "No cert", color: .purple)
+            }
+        }
+        .cardStyle()
+    }
+
+    // MARK: - Admin/Commissioner Section
+
+    private var adminSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("League Overview", systemImage: "building.2.fill")
+                        .font(.headline)
+                    Text("Tap to manage teams, registrations, and officials")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                if authManager.currentUser?.role == .commissioner || authManager.currentUser?.role == .admin {
+                    NavigationLink("Manage") {
+                        LeagueManagementView()
+                    }
+                    .font(.subheadline)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                }
+            }
+
+            // Pending registrations alert
+            if adminData.pendingRegistrationCount > 0 {
+                NavigationLink {
+                    RegistrationManagementView()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                        Text("\(adminData.pendingRegistrationCount) registration\(adminData.pendingRegistrationCount == 1 ? "" : "s") need\(adminData.pendingRegistrationCount == 1 ? "s" : "") approval")
+                            .font(.subheadline.weight(.medium))
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(12)
+                    .background(Color.orange.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusSM))
                 }
                 .buttonStyle(.plain)
             }
+
+            // Quick broadcast
+            Button {
+                showBroadcastSheet = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "megaphone.fill")
+                    Text("Send Broadcast")
+                        .font(.subheadline.weight(.medium))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(Color.accentColor.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusSM))
+            }
+            .buttonStyle(.plain)
+
+            HStack(spacing: 12) {
+                StatCard(icon: "person.3.fill", value: "\(adminData.teamCount)", label: "Teams")
+                StatCard(icon: "figure.run", value: "\(adminData.playerCount)", label: "Players")
+                StatCard(icon: "calendar", value: "\(adminData.upcomingGameCount)", label: "Games")
+            }
+        }
+    }
+
+    // MARK: - Player Section (fallback)
+
+    private var playerSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("My Team", systemImage: "figure.run")
+                        .font(.headline)
+                        .foregroundStyle(.orange)
+                    Text("Tap to view stats and schedule")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                NavigationLink("Player Portal") {
+                    PlayerPortalView()
+                }
+                .font(.subheadline)
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+                .controlSize(.small)
+            }
+
+            if let teamName = playerData.teamName {
+                HStack(spacing: 16) {
+                    VStack(spacing: 4) {
+                        Text(teamName)
+                            .font(.subheadline.weight(.semibold))
+                        Text("Team")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    if let jersey = playerData.jerseyNumber {
+                        VStack(spacing: 4) {
+                            Text("#\(jersey)")
+                                .font(.subheadline.weight(.bold).monospacedDigit())
+                                .foregroundStyle(.orange)
+                            Text("Jersey")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    if let position = playerData.position {
+                        VStack(spacing: 4) {
+                            Text(position.capitalized)
+                                .font(.subheadline.weight(.medium))
+                            Text("Position")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    Spacer()
+                }
+                .padding(10)
+                .background(Color.orange.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.radiusSM))
+            }
+
+            if let stats = playerData.statsSummary {
+                HStack(spacing: 12) {
+                    if let gamesPlayed = stats.games_played, gamesPlayed > 0 {
+                        StatCard(icon: "sportscourt.fill", value: "\(gamesPlayed)", label: "Games")
+                    }
+                    if let statValues = stats.stats {
+                        ForEach(Array(statValues.prefix(2)), id: \.key) { key, value in
+                            StatCard(icon: "chart.bar.fill", value: String(format: "%.0f", value), label: key.capitalized)
+                        }
+                    }
+                }
+            }
         }
         .cardStyle()
     }
+}
 
-    // MARK: - Coach Teams List
+// MARK: - Data Models
 
-    private var coachTeamsList: some View {
-        List {
-            if !viewModel.myTeams.isEmpty {
-                Section("Teams I Coach") {
-                    ForEach(viewModel.filteredTeams) { team in
-                        NavigationLink(value: team) {
-                            TeamRowView(team: team)
-                        }
-                    }
-                }
-            }
+@Observable @MainActor
+final class CoachHubData {
+    var teams: [Team] = []
 
-            if viewModel.allTeams.count > viewModel.myTeams.count {
-                if showAllTeams {
-                    Section("Other Teams") {
-                        ForEach(viewModel.allTeams.filter { team in
-                            !viewModel.myTeams.contains(where: { $0.id == team.id })
-                        }) { team in
-                            NavigationLink(value: team) {
-                                TeamRowView(team: team)
-                            }
-                        }
-                    }
-                }
-
-                Section {
-                    Button {
-                        withAnimation { showAllTeams.toggle() }
-                    } label: {
-                        Label(
-                            showAllTeams ? "Hide Other Teams" : "Browse All Teams",
-                            systemImage: showAllTeams ? "chevron.up" : "chevron.down"
-                        )
-                    }
-                }
-            }
+    func load(userId: String) async {
+        do {
+            let resp: TeamsResponse = try await APIClient.shared.request(.teams(), queryItems: [URLQueryItem(name: "per_page", value: "50")])
+            teams = resp.teams.filter { $0.coach?.user_id == userId }
+        } catch {
+            print("[MyHub] coach teams error: \(error)")
         }
-        .listStyle(.insetGrouped)
+    }
+}
+
+@Observable @MainActor
+final class ParentHubData {
+    var children: [ChildInfo] = []
+    var pendingRegistrations: [Registration] = []
+
+    func load(userId: String) async {
+        do {
+            let portal: ParentDashboardResponse = try await APIClient.shared.request(.parentPortal(userId))
+            children = portal.children ?? []
+            pendingRegistrations = (portal.pending_registrations ?? []).filter { $0.status == "pending" }
+        } catch {
+            print("[MyHub] parent data error: \(error)")
+        }
+    }
+}
+
+@Observable @MainActor
+final class RefereeHubData {
+    var assignmentCount: Int = 0
+    var totalEarnedCents: Int = 0
+    var certification: String?
+
+    var earnedDisplay: String {
+        totalEarnedCents == 0 ? "$0" : String(format: "$%.0f", Double(totalEarnedCents) / 100.0)
     }
 
-    // MARK: - Default Teams List
+    func load(userId: String) async {
+        do {
+            let ref: RefereePortalResponse = try await APIClient.shared.request(.refereePortal(userId))
+            assignmentCount = ref.assignment_count
+            totalEarnedCents = ref.total_earned_cents
+            certification = ref.certification_level
+        } catch {
+            print("[MyHub] referee data error: \(error)")
+        }
+    }
+}
 
-    private var defaultTeamsList: some View {
-        Group {
-            if viewModel.filteredTeams.isEmpty && !viewModel.searchText.isEmpty {
-                ContentUnavailableView.search(text: viewModel.searchText)
-            } else if viewModel.filteredTeams.isEmpty {
-                ContentUnavailableView(
-                    "No Teams",
-                    systemImage: "person.3",
-                    description: Text("You're not on any teams yet.")
-                )
-            } else {
-                List(viewModel.filteredTeams) { team in
-                    NavigationLink(value: team) {
-                        TeamRowView(team: team)
-                    }
-                }
-                .listStyle(.insetGrouped)
-            }
+@Observable @MainActor
+final class AdminHubData {
+    var teamCount: Int = 0
+    var playerCount: Int = 0
+    var upcomingGameCount: Int = 0
+    var pendingRegistrationCount: Int = 0
+
+    func load() async {
+        do {
+            let teams: TeamsResponse = try await APIClient.shared.request(.teams(), queryItems: [URLQueryItem(name: "per_page", value: "50")])
+            teamCount = teams.teams.count
+            playerCount = teams.teams.compactMap { $0.player_count }.reduce(0, +)
+        } catch {
+            print("[MyHub] admin teams error: \(error)")
+        }
+        do {
+            let events: EventsResponse = try await APIClient.shared.request(.events(), queryItems: [URLQueryItem(name: "per_page", value: "100")])
+            upcomingGameCount = events.events.filter { $0.isUpcoming && $0.isGame }.count
+        } catch {
+            print("[MyHub] admin events error: \(error)")
+        }
+        do {
+            let regs: RegistrationsResponse = try await APIClient.shared.request(
+                .registrations(),
+                queryItems: [URLQueryItem(name: "status", value: "pending"), URLQueryItem(name: "per_page", value: "100")]
+            )
+            pendingRegistrationCount = regs.registrations.filter { $0.status == "pending" }.count
+        } catch {
+            print("[MyHub] admin registrations error: \(error)")
+        }
+    }
+}
+
+@Observable @MainActor
+final class PlayerHubData {
+    var teamName: String?
+    var jerseyNumber: String?
+    var position: String?
+    var statsSummary: PlayerStatsSummary?
+
+    func load(userId: String) async {
+        do {
+            let portal: PlayerDashboardResponse = try await APIClient.shared.request(.playerPortal(userId))
+            teamName = portal.teams?.first?.name
+            jerseyNumber = portal.player?.jersey_number
+            position = portal.player?.position
+            statsSummary = portal.stats_summary
+        } catch {
+            // Player portal may not be available for all users
+            print("[MyHub] player data: \(error)")
         }
     }
 }
@@ -345,4 +516,5 @@ struct TeamsView: View {
 #Preview {
     TeamsView()
         .environment(AuthManager())
+        .environment(UserRolesManager())
 }

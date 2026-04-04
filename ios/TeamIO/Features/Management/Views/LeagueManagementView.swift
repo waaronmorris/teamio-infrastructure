@@ -190,6 +190,60 @@ final class RegistrationManagementViewModel {
         }
         isLoading = false
     }
+
+    func approve(_ id: String) async {
+        do {
+            try await APIClient.shared.requestVoid(.approveRegistration(id))
+            await load()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func waitlist(_ id: String) async {
+        do {
+            try await APIClient.shared.requestVoid(.waitlistRegistration(id))
+            await load()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func cancel(_ id: String) async {
+        do {
+            try await APIClient.shared.requestVoid(.cancelRegistration(id))
+            await load()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func markPaid(_ id: String, method: String) async {
+        struct PaymentUpdate: Encodable, Sendable {
+            let payment_status: String
+            let payment_method: String?
+        }
+        do {
+            let body = PaymentUpdate(payment_status: "paid", payment_method: method)
+            try await APIClient.shared.requestVoid(.updateRegistration(id), body: body)
+            await load()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func waiveFee(_ id: String) async {
+        struct WaiveUpdate: Encodable, Sendable {
+            let payment_status: String
+        }
+        do {
+            let body = WaiveUpdate(payment_status: "waived")
+            try await APIClient.shared.requestVoid(.updateRegistration(id), body: body)
+            await load()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
 }
 
 struct RegistrationManagementView: View {
@@ -210,7 +264,6 @@ struct RegistrationManagementView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Filter tabs
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(filters, id: \.self) { filter in
@@ -258,30 +311,147 @@ struct RegistrationManagementView: View {
                 Spacer()
             } else {
                 List(displayedRegistrations) { reg in
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        // Player + status
                         HStack {
                             Text(reg.player_name ?? "Unknown Player")
                                 .font(.subheadline.weight(.semibold))
                             Spacer()
-                            StatusBadge(
-                                text: reg.status.capitalized,
-                                color: reg.status.registrationStatusColor
-                            )
+                            StatusBadge(text: reg.status.capitalized, color: reg.status.registrationStatusColor)
                         }
+
+                        // Season + payment
                         HStack {
                             if let season = reg.season_name {
-                                Text(season)
+                                Label(season, systemImage: "calendar")
                             }
                             Spacer()
                             if let payment = reg.payment_status {
-                                Text("Payment: \(payment.capitalized)")
+                                Label(payment.capitalized, systemImage: payment == "paid" ? "checkmark.circle.fill" : "clock")
                                     .foregroundStyle(payment == "paid" ? .green : .orange)
                             }
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                        // Waiver
+                        if let waiver = reg.waiver_signed {
+                            HStack {
+                                Image(systemName: waiver ? "checkmark.seal.fill" : "xmark.seal")
+                                    .foregroundStyle(waiver ? .green : .orange)
+                                Text(waiver ? "Waiver signed" : "Waiver not signed")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+
+                        // Action buttons (for pending registrations)
+                        if reg.status == "pending" {
+                            HStack(spacing: 10) {
+                                Button {
+                                    Task { await viewModel.approve(reg.id) }
+                                } label: {
+                                    Label("Approve", systemImage: "checkmark.circle.fill")
+                                        .font(.caption.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .tint(.green)
+
+                                Button {
+                                    Task { await viewModel.waitlist(reg.id) }
+                                } label: {
+                                    Label("Waitlist", systemImage: "clock")
+                                        .font(.caption.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.orange)
+
+                                Button {
+                                    Task { await viewModel.cancel(reg.id) }
+                                } label: {
+                                    Label("Reject", systemImage: "xmark.circle.fill")
+                                        .font(.caption.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.red)
+                            }
+                        }
+
+                        // Waitlisted: show approve option
+                        if reg.status == "waitlisted" {
+                            Button {
+                                Task { await viewModel.approve(reg.id) }
+                            } label: {
+                                Label("Approve from Waitlist", systemImage: "checkmark.circle.fill")
+                                    .font(.caption.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 6)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.green)
+                        }
+
+                        // Payment actions (for approved registrations with pending payment)
+                        if reg.status == "approved" && reg.payment_status != "paid" && reg.payment_status != "waived" {
+                            Divider()
+                            Text("Record Payment")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+
+                            HStack(spacing: 8) {
+                                Button {
+                                    Task { await viewModel.markPaid(reg.id, method: "cash") }
+                                } label: {
+                                    Label("Cash", systemImage: "banknote")
+                                        .font(.caption.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.green)
+
+                                Button {
+                                    Task { await viewModel.markPaid(reg.id, method: "check") }
+                                } label: {
+                                    Label("Check", systemImage: "doc.text")
+                                        .font(.caption.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.green)
+
+                                Button {
+                                    Task { await viewModel.waiveFee(reg.id) }
+                                } label: {
+                                    Label("Waive", systemImage: "hand.raised")
+                                        .font(.caption.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.purple)
+                            }
+                        }
+
+                        // Show payment method if already paid
+                        if reg.payment_status == "waived" {
+                            HStack {
+                                Image(systemName: "hand.raised.fill")
+                                    .foregroundStyle(.purple)
+                                Text("Fee waived")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(.purple)
+                            }
+                        }
                     }
-                    .padding(.vertical, 2)
+                    .padding(.vertical, 4)
                 }
                 .listStyle(.insetGrouped)
             }
@@ -418,9 +588,9 @@ struct RefereeManagementView: View {
         Group {
             if viewModel.upcomingGames.isEmpty {
                 ContentUnavailableView(
-                    "No Upcoming Games",
+                    "You're all caught up!",
                     systemImage: "calendar",
-                    description: Text("No games need referee assignment.")
+                    description: Text("No games need referee assignment right now.")
                 )
             } else {
                 List(viewModel.upcomingGames) { event in
